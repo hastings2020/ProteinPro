@@ -1,0 +1,31 @@
+{
+  "name": "proteinpro",
+  "version": "1.0.0",
+  "description": "Full-stack protein tracking application",
+  "scripts": {
+    "install-all": "npm run install-backend && npm run install-frontend",
+    "install-backend": "cd backend && npm install",
+    "install-frontend": "cd frontend && npm install",
+    "init-db": "cd backend && npm run init-db",
+    "dev-backend": "cd backend && npm run dev",
+    "dev-frontend": "cd frontend && npm start",
+    "build-frontend": "cd frontend && npm run build",
+    "deploy-s3": "./deploy-to-s3.sh",
+    "setup-cloudfront": "./setup-cloudfront.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/ProteinPro.git"
+  },
+  "keywords": [
+    "protein",
+    "tracker",
+    "nutrition",
+    "health",
+    "fitness",
+    "ocr",
+    "food-tracking"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

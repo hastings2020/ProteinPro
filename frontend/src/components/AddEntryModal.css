@@ -1,0 +1,170 @@
+.add-entry-modal {
+  max-width: 600px;
+}
+
+.modal-tabs {
+  display: flex;
+  border-bottom: 2px solid #e0e0e0;
+  overflow-x: auto;
+}
+
+.tab-button {
+  flex: 1;
+  min-width: 100px;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.tab-button:hover {
+  color: #667eea;
+  background: #f9f9f9;
+}
+
+.tab-button.active {
+  color: #667eea;
+  border-bottom-color: #667eea;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Search Tab */
+.search-tab {
+  padding-top: 16px;
+}
+
+.search-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.search-bar .form-input {
+  flex: 1;
+}
+
+.search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.search-result-item {
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.search-result-item:hover {
+  background: #e8eaf6;
+  transform: translateX(4px);
+}
+
+.result-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.result-nutrients {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.nutrient-badge {
+  padding: 4px 10px;
+  background: #e0e0e0;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #666;
+}
+
+.nutrient-badge.protein {
+  background: #e8eaf6;
+  color: #667eea;
+}
+
+/* Favorites Tab */
+.favorites-tab {
+  padding-top: 16px;
+}
+
+.favorites-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.favorite-item {
+  padding: 16px;
+  background: #fffbf0;
+  border-radius: 8px;
+  border-left: 3px solid #ffd700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.favorite-item:hover {
+  background: #fff9e6;
+  transform: translateX(4px);
+}
+
+.favorite-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.star-icon {
+  color: #ffd700;
+  font-size: 14px;
+}
+
+.favorite-nutrients {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .tab-button {
+    font-size: 12px;
+    padding: 10px 12px;
+  }
+
+  .search-bar {
+    flex-direction: column;
+  }
+}

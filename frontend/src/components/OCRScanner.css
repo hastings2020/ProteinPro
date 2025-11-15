@@ -1,0 +1,117 @@
+.ocr-scanner {
+  padding-top: 16px;
+}
+
+.upload-area {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-prompt {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.upload-icon {
+  font-size: 64px;
+  color: #667eea;
+  margin-bottom: 20px;
+}
+
+.upload-prompt h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+}
+
+.upload-prompt p {
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.image-preview {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.image-preview img {
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.processing-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: white;
+}
+
+.spinner {
+  font-size: 48px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.progress-bar {
+  width: 200px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 16px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #667eea;
+  transition: width 0.3s ease;
+}
+
+.retry-button {
+  margin-top: 16px;
+  width: 100%;
+}
+
+.ocr-info {
+  background: #f9f9f9;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #666;
+}
+
+.ocr-info strong {
+  color: #333;
+}
+
+.ocr-info ul {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+
+.ocr-info li {
+  margin: 6px 0;
+}
+
+.ocr-note {
+  margin-top: 12px;
+  font-style: italic;
+  font-size: 12px;
+}
