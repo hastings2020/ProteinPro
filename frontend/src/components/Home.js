@@ -17,23 +17,38 @@ const Home = ({ user }) => {
   const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
-    loadTodayEntries();
-  }, []);
+    if (user && user.id) {
+      loadTodayEntries();
+    }
+  }, [user]);
 
   const loadTodayEntries = async () => {
+    if (!user || !user.id) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const data = await fetchEntriesByDate(user.id, today);
       setEntries(data);
     } catch (error) {
       console.error('Error loading entries:', error);
-      showNotification('Failed to load entries. Make sure the backend is running.', 'error');
+      const errorMsg = error.message.includes('Network Error') || error.code === 'ERR_NETWORK'
+        ? 'Cannot connect to backend. Please start the backend server: cd backend && npm run dev'
+        : 'Failed to load entries. Make sure the backend is running.';
+      showNotification(errorMsg, 'error');
     } finally {
       setLoading(false);
     }
   };
 
   const handleAddEntry = async (entryData) => {
+    if (!user || !user.id) {
+      showNotification('User not loaded yet. Please wait...', 'error');
+      return;
+    }
+
     try {
       const newEntry = await addEntry({
         ...entryData,
@@ -46,7 +61,16 @@ const Home = ({ user }) => {
       showNotification('Food entry added successfully!', 'success');
     } catch (error) {
       console.error('Error adding entry:', error);
-      const errorMsg = error.response?.data?.error || error.message || 'Failed to add entry. Make sure the backend is running on http://localhost:5000';
+      let errorMsg = 'Failed to add entry';
+
+      if (error.message.includes('Network Error') || error.code === 'ERR_NETWORK') {
+        errorMsg = 'Cannot connect to backend. Start backend with: cd backend && npm run dev';
+      } else if (error.response?.data?.error) {
+        errorMsg = error.response.data.error;
+      } else {
+        errorMsg = 'Failed to add entry. Make sure the backend is running on http://localhost:5000';
+      }
+
       showNotification(errorMsg, 'error');
     }
   };
@@ -96,6 +120,14 @@ const Home = ({ user }) => {
     setEditingEntry(null);
     setShowAddModal(true);
   };
+
+  if (!user) {
+    return (
+      <div className="page home-page">
+        <div className="loading-text">Loading user data...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="page home-page">

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import Navbar from './components/Navbar';
+import BackendStatus from './components/BackendStatus';
 import Home from './components/Home';
 import History from './components/History';
 import Calendar from './components/Calendar';
@@ -50,6 +51,7 @@ function App() {
   return (
     <Router>
       <div className="App">
+        <BackendStatus />
         <div className="app-container">
           <Routes>
             <Route path="/" element={<Home user={user} />} />
