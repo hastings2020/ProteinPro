@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaCamera, FaSearch, FaStar, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaBolt } from 'react-icons/fa';
 import './Home.css';
-import { fetchEntriesByDate, addEntry, deleteEntry, updateEntry, fetchFavorites, searchFoods } from '../services/api';
+import { fetchEntriesByDate, addEntry, deleteEntry, updateEntry } from '../services/api';
 import AddEntryModal from './AddEntryModal';
+import QuickAddModal from './QuickAddModal';
 import Notification from './Notification';
 
 const Home = ({ user }) => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [notification, setNotification] = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
 
@@ -25,7 +27,7 @@ const Home = ({ user }) => {
       setEntries(data);
     } catch (error) {
       console.error('Error loading entries:', error);
-      showNotification('Failed to load entries', 'error');
+      showNotification('Failed to load entries. Make sure the backend is running.', 'error');
     } finally {
       setLoading(false);
     }
@@ -40,10 +42,12 @@ const Home = ({ user }) => {
       });
       setEntries([...entries, newEntry]);
       setShowAddModal(false);
+      setShowQuickAdd(false);
       showNotification('Food entry added successfully!', 'success');
     } catch (error) {
       console.error('Error adding entry:', error);
-      showNotification('Failed to add entry', 'error');
+      const errorMsg = error.response?.data?.error || error.message || 'Failed to add entry. Make sure the backend is running on http://localhost:5000';
+      showNotification(errorMsg, 'error');
     }
   };
 
@@ -75,7 +79,7 @@ const Home = ({ user }) => {
 
   const showNotification = (message, type) => {
     setNotification({ message, type });
-    setTimeout(() => setNotification(null), 3000);
+    setTimeout(() => setNotification(null), 5000);
   };
 
   const totalProtein = entries.reduce((sum, entry) => sum + parseFloat(entry.protein_grams || 0), 0);
@@ -147,10 +151,15 @@ const Home = ({ user }) => {
         </div>
       </div>
 
-      {/* Quick Add Button */}
-      <button className="btn btn-primary btn-add-food" onClick={openAddModal}>
-        <FaPlus /> Add Food
-      </button>
+      {/* Quick Add Buttons */}
+      <div className="add-buttons">
+        <button className="btn btn-success btn-quick-add" onClick={() => setShowQuickAdd(true)}>
+          <FaBolt /> Quick Add
+        </button>
+        <button className="btn btn-primary btn-add-food" onClick={openAddModal}>
+          <FaPlus /> Full Entry
+        </button>
+      </div>
 
       {/* Today's Entries */}
       <div className="card">
@@ -192,6 +201,14 @@ const Home = ({ user }) => {
           </div>
         )}
       </div>
+
+      {/* Quick Add Modal */}
+      {showQuickAdd && (
+        <QuickAddModal
+          onClose={() => setShowQuickAdd(false)}
+          onSubmit={handleAddEntry}
+        />
+      )}
 
       {/* Add/Edit Entry Modal */}
       {showAddModal && (

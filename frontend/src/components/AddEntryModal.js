@@ -20,6 +20,7 @@ const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState('');
 
   useEffect(() => {
     if (editingEntry) {
@@ -65,17 +66,34 @@ const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
 
     try {
       setSearching(true);
+      setSearchError('');
       const results = await searchFoods(searchQuery);
-      setSearchResults(results);
+      
+      if (results && results.length > 0) {
+        setSearchResults(results);
+        setSearchError('');
+      } else {
+        setSearchResults([]);
+        setSearchError('No foods found. Try a different search term.');
+      }
     } catch (error) {
       console.error('Error searching foods:', error);
-      alert('Failed to search foods. Please try again.');
+      setSearchResults([]);
+      
+      if (error.response && error.response.status === 403) {
+        setSearchError('USDA API key limit reached. Use DEMO_KEY for limited searches or get your free API key at fdc.nal.usda.gov');
+      } else if (error.message.includes('Network Error')) {
+        setSearchError('Cannot connect to backend. Make sure the server is running on http://localhost:5000');
+      } else {
+        setSearchError('Failed to search foods. Backend may not be running or USDA API issue. Try manual entry instead.');
+      }
     } finally {
       setSearching(false);
     }
   };
 
   const selectFood = (food) => {
+    const servingText = food.servingSize ? food.servingSize + (food.servingUnit || 'g') : (food.serving_size || '100g');
     setFormData({
       ...formData,
       food_name: food.description || food.food_name,
@@ -83,7 +101,7 @@ const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
       calories: Math.round(food.calories || 0),
       carbs: food.carbs ? Math.round(food.carbs) : '',
       fat: food.fat ? Math.round(food.fat) : '',
-      serving_size: food.servingSize ? `${food.servingSize}${food.servingUnit || 'g'}` : food.serving_size || '100g'
+      serving_size: servingText
     });
     setActiveTab('manual');
   };
@@ -103,7 +121,7 @@ const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal add-entry-modal" onClick={e => e.stopPropagation()}>
+      <div className="modal add-entry-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2 className="modal-title">{editingEntry ? 'Edit Entry' : 'Add Food Entry'}</h2>
           <button className="modal-close" onClick={onClose}>
@@ -113,25 +131,25 @@ const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
 
         <div className="modal-tabs">
           <button
-            className={`tab-button ${activeTab === 'manual' ? 'active' : ''}`}
+            className={'tab-button' + (activeTab === 'manual' ? ' active' : '')}
             onClick={() => setActiveTab('manual')}
           >
             Manual Entry
           </button>
           <button
-            className={`tab-button ${activeTab === 'search' ? 'active' : ''}`}
+            className={'tab-button' + (activeTab === 'search' ? ' active' : '')}
             onClick={() => setActiveTab('search')}
           >
             <FaSearch /> Search Foods
           </button>
           <button
-            className={`tab-button ${activeTab === 'scan' ? 'active' : ''}`}
+            className={'tab-button' + (activeTab === 'scan' ? ' active' : '')}
             onClick={() => setActiveTab('scan')}
           >
             <FaCamera /> Scan Label
           </button>
           <button
-            className={`tab-button ${activeTab === 'favorites' ? 'active' : ''}`}
+            className={'tab-button' + (activeTab === 'favorites' ? ' active' : '')}
             onClick={() => setActiveTab('favorites')}
           >
             <FaStar /> Favorites
@@ -265,7 +283,7 @@ const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
                 <input
                   type="text"
                   className="form-input"
-                  placeholder="Search for foods..."
+                  placeholder="Search for foods (e.g., chicken breast, Greek yogurt)..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -274,6 +292,12 @@ const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
                   {searching ? 'Searching...' : 'Search'}
                 </button>
               </div>
+
+              {searchError && (
+                <div className="search-error">
+                  {searchError}
+                </div>
+              )}
 
               {searchResults.length > 0 && (
                 <div className="search-results">
@@ -289,8 +313,18 @@ const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
                 </div>
               )}
 
-              {searchResults.length === 0 && searchQuery && !searching && (
-                <div className="empty-state">No results found. Try a different search term.</div>
+              {!searching && searchResults.length === 0 && !searchError && searchQuery && (
+                <div className="empty-state">No results found. Try a different search term or use manual entry.</div>
+              )}
+
+              {!searchQuery && (
+                <div className="search-hint">
+                  <p><strong>Tip:</strong> Search the USDA FoodData Central database with 300,000+ foods!</p>
+                  <p>Try: "chicken breast", "Greek yogurt", "whey protein", etc.</p>
+                  <p style={{ fontSize: '12px', marginTop: '12px', color: '#999' }}>
+                    Note: Requires backend server running. See README for setup instructions.
+                  </p>
+                </div>
               )}
             </div>
           )}
@@ -307,7 +341,7 @@ const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
                 </div>
               ) : (
                 <div className="favorites-list">
-                  {favorites.map(fav => (
+                  {favorites.map((fav) => (
                     <div key={fav.id} className="favorite-item" onClick={() => selectFood(fav)}>
                       <div className="favorite-name">
                         <FaStar className="star-icon" />

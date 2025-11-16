@@ -87,12 +87,19 @@
   font-weight: 700;
 }
 
-/* Add Food Button */
-.btn-add-food {
-  width: 100%;
+/* Add Food Buttons */
+.add-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
   margin-bottom: 16px;
-  font-size: 18px;
-  padding: 16px;
+}
+
+.btn-quick-add,
+.btn-add-food {
+  font-size: 16px;
+  padding: 16px 12px;
+  white-space: nowrap;
 }
 
 /* Entries List */
@@ -213,5 +220,11 @@
 
   .stat-value {
     font-size: 20px;
+  }
+
+  .btn-quick-add,
+  .btn-add-food {
+    font-size: 14px;
+    padding: 14px 10px;
   }
 }
