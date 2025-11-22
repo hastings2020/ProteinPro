@@ -15,7 +15,9 @@ const BackendStatus = () => {
 
   const checkBackend = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/health');
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+      const healthUrl = apiUrl.replace('/api', '/api/health');
+      const response = await fetch(healthUrl);
       if (response.ok) {
         setBackendDown(false);
         setChecking(false);
