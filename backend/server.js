@@ -267,9 +267,11 @@ app.put('/api/entries/:id', async (req, res) => {
       fat,
       serving_size,
       meal_type,
-      entry_date,
       notes
     } = req.body;
+
+    // Get entry_date from request or use today's date as fallback
+    const entry_date = req.body.entry_date || new Date().toISOString().split('T')[0];
 
     await dbRun(
       `UPDATE food_entries

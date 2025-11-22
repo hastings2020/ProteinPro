@@ -14,6 +14,7 @@ const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
     fat: '',
     serving_size: '',
     meal_type: '',
+    entry_date: '',
     notes: ''
   });
   const [searchQuery, setSearchQuery] = useState('');
@@ -32,6 +33,7 @@ const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
         fat: editingEntry.fat || '',
         serving_size: editingEntry.serving_size || '',
         meal_type: editingEntry.meal_type || '',
+        entry_date: editingEntry.entry_date || '',
         notes: editingEntry.notes || ''
       });
     }
