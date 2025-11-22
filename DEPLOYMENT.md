@@ -51,7 +51,7 @@ This guide provides detailed instructions for deploying ProteinPro to various pl
 
 5. **Access Application**
    - Frontend: http://localhost:3000
-   - Backend API: http://localhost:5000
+   - Backend API: http://localhost:5001
 
 ---
 
@@ -237,7 +237,7 @@ aws s3 sync build/ s3://your-bucket-name --delete
        server_name your-domain.com;
 
        location /api {
-           proxy_pass http://localhost:5000;
+           proxy_pass http://localhost:5001;
            proxy_http_version 1.1;
            proxy_set_header Upgrade $http_upgrade;
            proxy_set_header Connection 'upgrade';
@@ -324,7 +324,7 @@ aws s3 sync build/ s3://your-bucket-name --delete
 
 3. **Run Container**
    ```bash
-   docker run -p 5000:5000 -e USDA_API_KEY=your-key proteinpro-api
+   docker run -p 5000:5001 -e USDA_API_KEY=your-key proteinpro-api
    ```
 
 4. **Deploy to Cloud**

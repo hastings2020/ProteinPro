@@ -73,7 +73,7 @@ npm run init-db
 npm run dev
 ```
 
-The backend will run on `http://localhost:5000`
+The backend will run on `http://localhost:5001`
 
 ### 3. Frontend Setup
 
@@ -99,7 +99,7 @@ The frontend will run on `http://localhost:3000`
 ### Backend Configuration (backend/.env)
 
 ```env
-PORT=5000
+PORT=5001
 USDA_API_KEY=DEMO_KEY
 ```
 
@@ -111,7 +111,7 @@ To get a free USDA API key:
 ### Frontend Configuration (frontend/.env)
 
 ```env
-REACT_APP_API_URL=http://localhost:5000/api
+REACT_APP_API_URL=http://localhost:5001/api
 ```
 
 For production, update this to your deployed backend URL.
@@ -328,7 +328,7 @@ npm run init-db
 ```
 
 **CORS errors**
-- Ensure backend is running on port 5000
+- Ensure backend is running on port 5001
 - Check frontend .env has correct API URL
 
 **USDA API rate limiting**

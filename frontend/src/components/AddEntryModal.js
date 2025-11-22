@@ -83,7 +83,7 @@ const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
       if (error.response && error.response.status === 403) {
         setSearchError('USDA API key limit reached. Use DEMO_KEY for limited searches or get your free API key at fdc.nal.usda.gov');
       } else if (error.message.includes('Network Error')) {
-        setSearchError('Cannot connect to backend. Make sure the server is running on http://localhost:5000');
+        setSearchError('Cannot connect to backend. Make sure the server is running on http://localhost:5001');
       } else {
         setSearchError('Failed to search foods. Backend may not be running or USDA API issue. Try manual entry instead.');
       }

@@ -297,7 +297,7 @@ USDA_API_KEY=your_key
 
 ### Frontend
 ```
-REACT_APP_API_URL=http://localhost:5000/api
+REACT_APP_API_URL=http://localhost:5001/api
 ```
 
 ## Scripts Reference

@@ -83,8 +83,8 @@ echo ""
 
 # Check if backend is running
 echo "7. Checking backend server..."
-if curl -s http://localhost:5000/api/health > /dev/null 2>&1; then
-    echo -e "${GREEN}✓${NC} Backend is running on http://localhost:5000"
+if curl -s http://localhost:5001/api/health > /dev/null 2>&1; then
+    echo -e "${GREEN}✓${NC} Backend is running on http://localhost:5001"
 else
     echo -e "${YELLOW}⚠${NC} Backend is not running"
     echo "   Start it with: cd backend && npm run dev"

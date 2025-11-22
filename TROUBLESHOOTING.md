@@ -24,7 +24,7 @@ This will check all requirements and give you specific instructions for any miss
 ✅ **Check if backend is running:**
 ```bash
 # Test if backend is responding
-curl http://localhost:5000/api/health
+curl http://localhost:5001/api/health
 ```
 
 If you get a connection error, the backend isn't running.
@@ -49,7 +49,7 @@ npm run init-db
 ✅ **Check for port conflicts:**
 ```bash
 # Check if something else is using port 5000
-lsof -i :5000
+lsof -i :5001
 ```
 
 If another process is using it, kill it or change the backend port in `backend/.env`.
@@ -78,7 +78,7 @@ The DEMO_KEY has limited requests. For unlimited searches:
 
 ✅ **Test the API directly:**
 ```bash
-curl "http://localhost:5000/api/food/search?query=chicken"
+curl "http://localhost:5001/api/food/search?query=chicken"
 ```
 
 ✅ **Check error messages:**
@@ -115,7 +115,7 @@ node server.js
 ✅ **Port already in use:**
 ```bash
 # Find process using port 5000
-lsof -i :5000
+lsof -i :5001
 kill -9 <PID>
 
 # Or change port in backend/.env
@@ -198,10 +198,10 @@ Open Developer Tools (F12) and look for errors in the Console tab.
 ✅ **Verify API connection:**
 ```bash
 # Check if user exists
-curl http://localhost:5000/api/user/1
+curl http://localhost:5001/api/user/1
 
 # Check if entries exist
-curl http://localhost:5000/api/entries/1
+curl http://localhost:5001/api/entries/1
 ```
 
 ✅ **Check correct date format:**
@@ -230,7 +230,7 @@ app.use(cors());
 ✅ **Check frontend API URL:**
 In `frontend/.env`:
 ```env
-REACT_APP_API_URL=http://localhost:5000/api
+REACT_APP_API_URL=http://localhost:5001/api
 ```
 
 ✅ **Restart both servers** after changing environment variables.
@@ -332,11 +332,11 @@ cp frontend/.env.example frontend/.env
 
 Frontend `.env` should have:
 ```env
-REACT_APP_API_URL=http://localhost:5000/api
+REACT_APP_API_URL=http://localhost:5001/api
 ```
 
 NOT:
-- `http://localhost:5000` (missing /api)
+- `http://localhost:5001` (missing /api)
 - `https://...` (should be http for local)
 - Different port than backend
 
@@ -366,7 +366,7 @@ chmod +x verify-setup.sh
 **Port Binding Issues:**
 ```bash
 # Check what's using ports
-sudo lsof -i :5000
+sudo lsof -i :5001
 sudo lsof -i :3000
 ```
 
@@ -423,7 +423,7 @@ Visit the repository issues page for known problems and solutions.
 
 When everything is working correctly:
 
-✅ Backend responds at http://localhost:5000/api/health
+✅ Backend responds at http://localhost:5001/api/health
 ✅ Frontend loads at http://localhost:3000
 ✅ Can add food entries
 ✅ Can search foods (with backend running)

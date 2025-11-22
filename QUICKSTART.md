@@ -75,8 +75,8 @@ npm run dev-frontend
 ## Access the Application
 
 - **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:5000
-- **API Health Check**: http://localhost:5000/api/health
+- **Backend API**: http://localhost:5001
+- **API Health Check**: http://localhost:5001/api/health
 
 ## Sample Data
 
@@ -104,7 +104,7 @@ If port 5000 or 3000 is already in use:
 
 ```bash
 # Find and kill the process
-lsof -i :5000  # or :3000
+lsof -i :5001  # or :3000
 kill -9 <PID>
 ```
 
@@ -132,7 +132,7 @@ npm run install-all
 
 Ensure:
 - Backend is running on port 5000
-- Frontend `.env` has `REACT_APP_API_URL=http://localhost:5000/api`
+- Frontend `.env` has `REACT_APP_API_URL=http://localhost:5001/api`
 
 ## Development Tips
 
@@ -182,22 +182,22 @@ ORDER BY entry_date DESC;
 
 ```bash
 # Health check
-curl http://localhost:5000/api/health
+curl http://localhost:5001/api/health
 
 # Get user
-curl http://localhost:5000/api/user/1
+curl http://localhost:5001/api/user/1
 
 # Get today's entries
-curl http://localhost:5000/api/entries/1/date/2024-01-15
+curl http://localhost:5001/api/entries/1/date/2024-01-15
 
 # Search foods
-curl "http://localhost:5000/api/food/search?query=chicken"
+curl "http://localhost:5001/api/food/search?query=chicken"
 ```
 
 ### Using Postman or Insomnia
 
 Import the API endpoints:
-- Base URL: http://localhost:5000/api
+- Base URL: http://localhost:5001/api
 - See README.md for full API documentation
 
 ## Next Steps

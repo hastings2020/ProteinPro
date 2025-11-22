@@ -45,8 +45,8 @@ npm run dev
 You should see:
 ```
 Connected to SQLite database
-ProteinPro API server running on port 5000
-Health check: http://localhost:5000/api/health
+ProteinPro API server running on port 5001
+Health check: http://localhost:5001/api/health
 ```
 
 **Terminal 2 - Frontend:**
@@ -59,7 +59,7 @@ Browser will automatically open to http://localhost:3000
 
 ## ✅ Verify It's Working
 
-1. Backend running: http://localhost:5000/api/health
+1. Backend running: http://localhost:5001/api/health
    - Should show: `{"status":"ok","message":"ProteinPro API is running"}`
 
 2. Frontend loaded: http://localhost:3000
@@ -89,7 +89,7 @@ Browser will automatically open to http://localhost:3000
   ```
 
 ### "Cannot connect to backend"
-1. Check backend is running: `curl http://localhost:5000/api/health`
+1. Check backend is running: `curl http://localhost:5001/api/health`
 2. If not running: `cd backend && npm run dev`
 3. Check the terminal for error messages
 
@@ -103,8 +103,8 @@ npm run dev       # Start server
 
 ### Port Already in Use
 ```bash
-# Kill process on port 5000
-lsof -i :5000
+# Kill process on port 5001
+lsof -i :5001
 kill -9 <PID>
 
 # Or kill process on port 3000
