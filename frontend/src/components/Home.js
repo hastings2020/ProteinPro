@@ -68,7 +68,7 @@ const Home = ({ user }) => {
       } else if (error.response?.data?.error) {
         errorMsg = error.response.data.error;
       } else {
-        errorMsg = 'Failed to add entry. Make sure the backend is running on http://localhost:5000';
+        errorMsg = 'Failed to add entry. Make sure the backend is running on http://localhost:5001';
       }
 
       showNotification(errorMsg, 'error');

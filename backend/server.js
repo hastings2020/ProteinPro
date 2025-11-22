@@ -231,9 +231,16 @@ app.post('/api/entries', async (req, res) => {
       fat,
       serving_size,
       meal_type,
-      entry_date,
       notes
     } = req.body;
+
+    // Get entry_date from request or use today's date as fallback
+    const entry_date = req.body.entry_date || new Date().toISOString().split('T')[0];
+
+    // Validate required fields
+    if (!food_name || !protein_grams) {
+      return res.status(400).json({ error: 'food_name and protein_grams are required' });
+    }
 
     const result = await dbRun(
       `INSERT INTO food_entries
