@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaTimes, FaSearch, FaCamera, FaStar } from 'react-icons/fa';
 import './AddEntryModal.css';
-import { searchFoods, fetchFavorites } from '../services/api';
+import api, { searchFoods, fetchFavorites } from '../services/api';
 import OCRScanner from './OCRScanner';
 
 const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
@@ -22,6 +22,7 @@ const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
   const [favorites, setFavorites] = useState([]);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
+  const [searchTimeout, setSearchTimeout] = useState(null);
 
   useEffect(() => {
     if (editingEntry) {
@@ -63,14 +64,17 @@ const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
     onSubmit(formData);
   };
 
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
+  const handleSearch = async (query = searchQuery) => {
+    if (!query || query.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
 
     try {
       setSearching(true);
       setSearchError('');
-      const results = await searchFoods(searchQuery);
-      
+      const results = await searchFoods(query);
+
       if (results && results.length > 0) {
         setSearchResults(results);
         setSearchError('');
@@ -81,7 +85,7 @@ const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
     } catch (error) {
       console.error('Error searching foods:', error);
       setSearchResults([]);
-      
+
       if (error.response && error.response.status === 403) {
         setSearchError('USDA API key limit reached. Use DEMO_KEY for limited searches or get your free API key at fdc.nal.usda.gov');
       } else if (error.message.includes('Network Error')) {
@@ -91,6 +95,27 @@ const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
       }
     } finally {
       setSearching(false);
+    }
+  };
+
+  const handleSearchInputChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    // Clear previous timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    // Set new timeout for auto-search (debounce)
+    if (query.trim().length >= 2) {
+      const timeout = setTimeout(() => {
+        handleSearch(query);
+      }, 500); // Wait 500ms after user stops typing
+      setSearchTimeout(timeout);
+    } else {
+      setSearchResults([]);
+      setSearchError('');
     }
   };
 
@@ -106,6 +131,34 @@ const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
       serving_size: servingText
     });
     setActiveTab('manual');
+  };
+
+  const addSearchResultToFavorites = async (food, e) => {
+    e.stopPropagation(); // Prevent selecting the food
+    try {
+      const servingText = food.servingSize ? food.servingSize + (food.servingUnit || 'g') : '100g';
+      await api.post('/favorites', {
+        user_id: user.id,
+        food_name: food.description,
+        protein_grams: Math.round(food.protein),
+        calories: Math.round(food.calories || 0),
+        serving_size: servingText
+      });
+      alert('Added to favorites!');
+      loadFavorites(); // Reload favorites list
+    } catch (error) {
+      console.error('Error adding to favorites:', error);
+      alert('Failed to add to favorites');
+    }
+  };
+
+  const handleOCRAddToFavorites = async (favoriteData) => {
+    try {
+      await api.post('/favorites', favoriteData);
+      loadFavorites(); // Reload favorites list
+    } catch (error) {
+      throw error;
+    }
   };
 
   const handleOCRResult = (result) => {
@@ -285,14 +338,12 @@ const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
                 <input
                   type="text"
                   className="form-input"
-                  placeholder="Search for foods (e.g., chicken breast, Greek yogurt)..."
+                  placeholder="Start typing to search (e.g., chicken breast, Greek yogurt)..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={handleSearchInputChange}
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                 />
-                <button className="btn btn-primary" onClick={handleSearch} disabled={searching}>
-                  {searching ? 'Searching...' : 'Search'}
-                </button>
+                {searching && <span className="searching-indicator">Searching...</span>}
               </div>
 
               {searchError && (
@@ -305,11 +356,22 @@ const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
                 <div className="search-results">
                   {searchResults.map((food, index) => (
                     <div key={index} className="search-result-item" onClick={() => selectFood(food)}>
-                      <div className="result-name">{food.description}</div>
-                      <div className="result-nutrients">
-                        <span className="nutrient-badge protein">{Math.round(food.protein)}g protein</span>
-                        <span className="nutrient-badge">{Math.round(food.calories)} cal</span>
+                      <div className="result-content">
+                        <div className="result-name">{food.description}</div>
+                        <div className="result-nutrients">
+                          <span className="nutrient-badge protein">{Math.round(food.protein)}g protein</span>
+                          <span className="nutrient-badge">{Math.round(food.calories)} cal</span>
+                          <span className="nutrient-badge">{Math.round(food.carbs || 0)}g carbs</span>
+                          <span className="nutrient-badge">{Math.round(food.fat || 0)}g fat</span>
+                        </div>
                       </div>
+                      <button
+                        className="btn-add-to-favorites"
+                        onClick={(e) => addSearchResultToFavorites(food, e)}
+                        title="Add to favorites"
+                      >
+                        <FaStar />
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -332,7 +394,11 @@ const AddEntryModal = ({ onClose, onSubmit, editingEntry, user }) => {
           )}
 
           {activeTab === 'scan' && (
-            <OCRScanner onResult={handleOCRResult} />
+            <OCRScanner
+              onResult={handleOCRResult}
+              user={user}
+              onAddToFavorites={handleOCRAddToFavorites}
+            />
           )}
 
           {activeTab === 'favorites' && (

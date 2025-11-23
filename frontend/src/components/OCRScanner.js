@@ -1,12 +1,15 @@
 import React, { useState, useRef } from 'react';
 import Tesseract from 'tesseract.js';
-import { FaCamera, FaUpload, FaSpinner } from 'react-icons/fa';
+import { FaCamera, FaUpload, FaSpinner, FaStar, FaCheck } from 'react-icons/fa';
 import './OCRScanner.css';
 
-const OCRScanner = ({ onResult }) => {
+const OCRScanner = ({ onResult, user, onAddToFavorites }) => {
   const [image, setImage] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [extractedData, setExtractedData] = useState(null);
+  const [servingType, setServingType] = useState('per_serve');
+  const [servingMultiplier, setServingMultiplier] = useState(1);
   const fileInputRef = useRef(null);
 
   const handleImageUpload = (e) => {
@@ -42,13 +45,15 @@ const OCRScanner = ({ onResult }) => {
       const nutritionData = extractNutritionInfo(text);
 
       if (nutritionData.protein_grams) {
-        onResult(nutritionData);
+        setExtractedData(nutritionData);
       } else {
-        alert('Could not detect protein information. Please enter manually or try a clearer image.');
+        alert('Could not detect protein information. Please try a clearer image or enter manually.');
+        setImage(null);
       }
     } catch (error) {
       console.error('OCR Error:', error);
       alert('Failed to process image. Please try again or enter manually.');
+      setImage(null);
     } finally {
       setProcessing(false);
       setProgress(0);
@@ -142,6 +147,70 @@ const OCRScanner = ({ onResult }) => {
     return data;
   };
 
+  const handleServingTypeChange = (type) => {
+    setServingType(type);
+    // You can set default multipliers based on type if needed
+    if (type === 'per_100g') {
+      // If original was per serve, might need adjustment
+      // For now, keep multiplier at 1
+    }
+  };
+
+  const getAdjustedData = () => {
+    if (!extractedData) return null;
+
+    const multiplier = parseFloat(servingMultiplier) || 1;
+
+    return {
+      ...extractedData,
+      protein_grams: (parseFloat(extractedData.protein_grams) * multiplier).toFixed(1),
+      calories: extractedData.calories ? Math.round(parseFloat(extractedData.calories) * multiplier) : '',
+      carbs: extractedData.carbs ? (parseFloat(extractedData.carbs) * multiplier).toFixed(1) : '',
+      fat: extractedData.fat ? (parseFloat(extractedData.fat) * multiplier).toFixed(1) : '',
+      serving_size: servingType === 'per_serve' ? 'Per Serving' :
+                    servingType === 'per_100g' ? 'Per 100g' :
+                    'Whole Package'
+    };
+  };
+
+  const handleUseData = () => {
+    const adjustedData = getAdjustedData();
+    onResult(adjustedData);
+    resetScanner();
+  };
+
+  const handleAddToFavorites = async () => {
+    if (!onAddToFavorites) {
+      alert('Add to favorites not available');
+      return;
+    }
+
+    const adjustedData = getAdjustedData();
+    try {
+      await onAddToFavorites({
+        user_id: user?.id || 1,
+        food_name: adjustedData.food_name || 'Scanned Food',
+        protein_grams: parseFloat(adjustedData.protein_grams),
+        calories: adjustedData.calories ? parseFloat(adjustedData.calories) : null,
+        serving_size: adjustedData.serving_size
+      });
+      alert('Added to favorites!');
+    } catch (error) {
+      console.error('Error adding to favorites:', error);
+      alert('Failed to add to favorites');
+    }
+  };
+
+  const resetScanner = () => {
+    setImage(null);
+    setExtractedData(null);
+    setServingType('per_serve');
+    setServingMultiplier(1);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <div className="ocr-scanner">
       {!image ? (
@@ -167,7 +236,7 @@ const OCRScanner = ({ onResult }) => {
         </div>
       ) : (
         <div className="image-preview">
-          <img src={image} alt="Nutrition label" />
+          <img src={image} alt="Nutrition label" className="preview-image" />
           {processing && (
             <div className="processing-overlay">
               <FaSpinner className="spinner" />
@@ -178,13 +247,89 @@ const OCRScanner = ({ onResult }) => {
               <p>{progress}%</p>
             </div>
           )}
-          {!processing && (
+          {!processing && extractedData && (
+            <div className="extracted-data">
+              <h3>Extracted Nutrition Data</h3>
+
+              <div className="serving-type-selector">
+                <label className="serving-label">This nutrition info is for:</label>
+                <div className="serving-options">
+                  <button
+                    className={'serving-option' + (servingType === 'per_serve' ? ' active' : '')}
+                    onClick={() => handleServingTypeChange('per_serve')}
+                  >
+                    Per Serving
+                  </button>
+                  <button
+                    className={'serving-option' + (servingType === 'per_100g' ? ' active' : '')}
+                    onClick={() => handleServingTypeChange('per_100g')}
+                  >
+                    Per 100g
+                  </button>
+                  <button
+                    className={'serving-option' + (servingType === 'whole' ? ' active' : '')}
+                    onClick={() => handleServingTypeChange('whole')}
+                  >
+                    Whole Package
+                  </button>
+                </div>
+              </div>
+
+              <div className="multiplier-input">
+                <label>Multiply values by:</label>
+                <input
+                  type="number"
+                  min="0.1"
+                  step="0.1"
+                  value={servingMultiplier}
+                  onChange={(e) => setServingMultiplier(e.target.value)}
+                  className="form-input"
+                />
+                <span className="multiplier-hint">(e.g., 2 for double portion)</span>
+              </div>
+
+              <div className="nutrition-preview">
+                <div className="nutrition-item">
+                  <span className="nutrition-label">Protein:</span>
+                  <span className="nutrition-value">{getAdjustedData().protein_grams}g</span>
+                </div>
+                {getAdjustedData().calories && (
+                  <div className="nutrition-item">
+                    <span className="nutrition-label">Calories:</span>
+                    <span className="nutrition-value">{getAdjustedData().calories}</span>
+                  </div>
+                )}
+                {getAdjustedData().carbs && (
+                  <div className="nutrition-item">
+                    <span className="nutrition-label">Carbs:</span>
+                    <span className="nutrition-value">{getAdjustedData().carbs}g</span>
+                  </div>
+                )}
+                {getAdjustedData().fat && (
+                  <div className="nutrition-item">
+                    <span className="nutrition-label">Fat:</span>
+                    <span className="nutrition-value">{getAdjustedData().fat}g</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="ocr-actions">
+                <button className="btn btn-success" onClick={handleUseData}>
+                  <FaCheck /> Use This Data
+                </button>
+                <button className="btn btn-warning" onClick={handleAddToFavorites}>
+                  <FaStar /> Add to Favorites
+                </button>
+                <button className="btn btn-secondary" onClick={resetScanner}>
+                  Try Another Image
+                </button>
+              </div>
+            </div>
+          )}
+          {!processing && !extractedData && (
             <button
               className="btn btn-secondary retry-button"
-              onClick={() => {
-                setImage(null);
-                fileInputRef.current.value = '';
-              }}
+              onClick={resetScanner}
             >
               Try Another Image
             </button>

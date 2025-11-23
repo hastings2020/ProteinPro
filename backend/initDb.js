@@ -29,6 +29,7 @@ db.serialize(() => {
       fat REAL,
       serving_size TEXT,
       meal_type TEXT,
+      quantity INTEGER DEFAULT 1,
       entry_date DATE NOT NULL,
       entry_time TIME DEFAULT CURRENT_TIME,
       notes TEXT,
@@ -76,29 +77,29 @@ db.serialize(() => {
 
   const sampleEntries = [
     // Today's entries
-    [1, 'Grilled Chicken Breast', 31, 165, 0, 3.6, '100g', 'lunch', today, '12:30:00', 'Delicious!', 1],
-    [1, 'Greek Yogurt', 17, 100, 6, 0.4, '170g', 'breakfast', today, '08:00:00', 'With berries', 1],
-    [1, 'Protein Shake', 25, 120, 3, 1.5, '1 scoop', 'snack', today, '15:00:00', 'Post-workout', 1],
-    [1, 'Salmon Fillet', 22, 206, 0, 13, '100g', 'dinner', today, '19:00:00', 'Baked with herbs', 0],
+    [1, 'Grilled Chicken Breast', 31, 165, 0, 3.6, '100g', 'lunch', 1, today, '12:30:00', 'Delicious!', 1],
+    [1, 'Greek Yogurt', 17, 100, 6, 0.4, '170g', 'breakfast', 1, today, '08:00:00', 'With berries', 1],
+    [1, 'Protein Shake', 25, 120, 3, 1.5, '1 scoop', 'snack', 1, today, '15:00:00', 'Post-workout', 1],
+    [1, 'Salmon Fillet', 22, 206, 0, 13, '100g', 'dinner', 1, today, '19:00:00', 'Baked with herbs', 0],
 
     // Yesterday's entries
-    [1, 'Eggs (2 large)', 13, 140, 1, 10, '2 eggs', 'breakfast', yesterday, '08:30:00', 'Scrambled', 1],
-    [1, 'Tuna Salad', 26, 180, 5, 7, '150g', 'lunch', yesterday, '13:00:00', 'With olive oil', 0],
-    [1, 'Cottage Cheese', 14, 110, 6, 2.5, '113g', 'snack', yesterday, '16:00:00', 'Low fat', 1],
-    [1, 'Beef Steak', 26, 250, 0, 17, '100g', 'dinner', yesterday, '20:00:00', 'Medium rare', 0],
-    [1, 'Almonds', 6, 170, 6, 15, '28g', 'snack', yesterday, '10:00:00', 'Roasted', 0],
+    [1, 'Eggs (2 large)', 13, 140, 1, 10, '2 eggs', 'breakfast', 2, yesterday, '08:30:00', 'Scrambled', 1],
+    [1, 'Tuna Salad', 26, 180, 5, 7, '150g', 'lunch', 1, yesterday, '13:00:00', 'With olive oil', 0],
+    [1, 'Cottage Cheese', 14, 110, 6, 2.5, '113g', 'snack', 1, yesterday, '16:00:00', 'Low fat', 1],
+    [1, 'Beef Steak', 26, 250, 0, 17, '100g', 'dinner', 1, yesterday, '20:00:00', 'Medium rare', 0],
+    [1, 'Almonds', 6, 170, 6, 15, '28g', 'snack', 1, yesterday, '10:00:00', 'Roasted', 0],
 
     // Two days ago
-    [1, 'Protein Pancakes', 20, 220, 24, 8, '2 pancakes', 'breakfast', twoDaysAgo, '09:00:00', 'Homemade', 0],
-    [1, 'Chicken Salad', 28, 200, 8, 9, '200g', 'lunch', twoDaysAgo, '12:00:00', 'Caesar style', 0],
-    [1, 'Protein Bar', 20, 200, 22, 7, '1 bar', 'snack', twoDaysAgo, '15:30:00', 'Chocolate flavor', 1],
-    [1, 'Turkey Breast', 29, 135, 0, 1, '100g', 'dinner', twoDaysAgo, '18:30:00', 'Oven roasted', 0]
+    [1, 'Protein Pancakes', 20, 220, 24, 8, '2 pancakes', 'breakfast', 2, twoDaysAgo, '09:00:00', 'Homemade', 0],
+    [1, 'Chicken Salad', 28, 200, 8, 9, '200g', 'lunch', 1, twoDaysAgo, '12:00:00', 'Caesar style', 0],
+    [1, 'Protein Bar', 20, 200, 22, 7, '1 bar', 'snack', 1, twoDaysAgo, '15:30:00', 'Chocolate flavor', 1],
+    [1, 'Turkey Breast', 29, 135, 0, 1, '100g', 'dinner', 1, twoDaysAgo, '18:30:00', 'Oven roasted', 0]
   ];
 
   const insertStmt = db.prepare(`
     INSERT INTO food_entries
-    (user_id, food_name, protein_grams, calories, carbs, fat, serving_size, meal_type, entry_date, entry_time, notes, is_favorite)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (user_id, food_name, protein_grams, calories, carbs, fat, serving_size, meal_type, quantity, entry_date, entry_time, notes, is_favorite)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   sampleEntries.forEach(entry => {

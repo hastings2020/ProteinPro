@@ -190,7 +190,8 @@ app.post('/api/entries', async (req, res) => {
       fat,
       serving_size,
       meal_type,
-      notes
+      notes,
+      quantity = 1
     } = req.body;
 
     const entry_date = req.body.entry_date || new Date().toISOString().split('T')[0];
@@ -209,6 +210,7 @@ app.post('/api/entries', async (req, res) => {
       fat: fat ? parseFloat(fat) : null,
       serving_size: serving_size || null,
       meal_type: meal_type || null,
+      quantity: parseInt(quantity) || 1,
       entry_date,
       entry_time: new Date().toISOString(),
       notes: notes || null
@@ -235,7 +237,8 @@ app.put('/api/entries/:id', async (req, res) => {
       fat,
       serving_size,
       meal_type,
-      notes
+      notes,
+      quantity = 1
     } = req.body;
 
     const entry_date = req.body.entry_date || new Date().toISOString().split('T')[0];
@@ -243,7 +246,7 @@ app.put('/api/entries/:id', async (req, res) => {
     const result = await ddb.send(new UpdateCommand({
       TableName: ENTRIES_TABLE,
       Key: { id: req.params.id },
-      UpdateExpression: 'set food_name = :name, protein_grams = :protein, calories = :cal, carbs = :carbs, fat = :fat, serving_size = :serving, meal_type = :meal, entry_date = :date, notes = :notes',
+      UpdateExpression: 'set food_name = :name, protein_grams = :protein, calories = :cal, carbs = :carbs, fat = :fat, serving_size = :serving, meal_type = :meal, quantity = :quantity, entry_date = :date, notes = :notes',
       ExpressionAttributeValues: {
         ':name': food_name,
         ':protein': parseFloat(protein_grams),
@@ -252,6 +255,7 @@ app.put('/api/entries/:id', async (req, res) => {
         ':fat': fat ? parseFloat(fat) : null,
         ':serving': serving_size || null,
         ':meal': meal_type || null,
+        ':quantity': parseInt(quantity) || 1,
         ':date': entry_date,
         ':notes': notes || null
       },

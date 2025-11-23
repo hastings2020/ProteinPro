@@ -231,7 +231,8 @@ app.post('/api/entries', async (req, res) => {
       fat,
       serving_size,
       meal_type,
-      notes
+      notes,
+      quantity = 1
     } = req.body;
 
     // Get entry_date from request or use today's date as fallback
@@ -244,9 +245,9 @@ app.post('/api/entries', async (req, res) => {
 
     const result = await dbRun(
       `INSERT INTO food_entries
-      (user_id, food_name, protein_grams, calories, carbs, fat, serving_size, meal_type, entry_date, notes)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [user_id, food_name, protein_grams, calories, carbs, fat, serving_size, meal_type, entry_date, notes]
+      (user_id, food_name, protein_grams, calories, carbs, fat, serving_size, meal_type, quantity, entry_date, notes)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [user_id, food_name, protein_grams, calories, carbs, fat, serving_size, meal_type, quantity, entry_date, notes]
     );
 
     const entry = await dbGet('SELECT * FROM food_entries WHERE id = ?', [result.id]);
@@ -267,7 +268,8 @@ app.put('/api/entries/:id', async (req, res) => {
       fat,
       serving_size,
       meal_type,
-      notes
+      notes,
+      quantity = 1
     } = req.body;
 
     // Get entry_date from request or use today's date as fallback
@@ -276,9 +278,9 @@ app.put('/api/entries/:id', async (req, res) => {
     await dbRun(
       `UPDATE food_entries
       SET food_name = ?, protein_grams = ?, calories = ?, carbs = ?, fat = ?,
-          serving_size = ?, meal_type = ?, entry_date = ?, notes = ?
+          serving_size = ?, meal_type = ?, quantity = ?, entry_date = ?, notes = ?
       WHERE id = ?`,
-      [food_name, protein_grams, calories, carbs, fat, serving_size, meal_type, entry_date, notes, req.params.id]
+      [food_name, protein_grams, calories, carbs, fat, serving_size, meal_type, quantity, entry_date, notes, req.params.id]
     );
 
     const entry = await dbGet('SELECT * FROM food_entries WHERE id = ?', [req.params.id]);

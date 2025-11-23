@@ -36,11 +36,12 @@
   margin-bottom: 20px;
 }
 
-.image-preview img {
+.preview-image {
   width: 100%;
-  max-height: 400px;
+  max-height: 200px;
   object-fit: contain;
   border-radius: 8px;
+  margin-bottom: 16px;
 }
 
 .processing-overlay {
@@ -114,4 +115,144 @@
   margin-top: 12px;
   font-style: italic;
   font-size: 12px;
+}
+
+/* Extracted Data Section */
+.extracted-data {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+.extracted-data h3 {
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: #1a1a1a;
+  text-align: center;
+}
+
+.serving-type-selector {
+  margin-bottom: 20px;
+}
+
+.serving-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #333;
+  font-size: 14px;
+}
+
+.serving-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.serving-option {
+  padding: 12px 8px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.serving-option:hover {
+  border-color: #667eea;
+  background: #f5f7ff;
+}
+
+.serving-option.active {
+  background: #667eea;
+  border-color: #667eea;
+  color: white;
+}
+
+.multiplier-input {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+}
+
+.multiplier-input label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+  font-size: 14px;
+}
+
+.multiplier-input .form-input {
+  width: 100px;
+  margin-right: 12px;
+}
+
+.multiplier-hint {
+  font-size: 12px;
+  color: #999;
+  font-style: italic;
+}
+
+.nutrition-preview {
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.nutrition-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.nutrition-item:last-child {
+  border-bottom: none;
+}
+
+.nutrition-label {
+  font-weight: 600;
+  color: #333;
+}
+
+.nutrition-value {
+  font-weight: 700;
+  color: #667eea;
+  font-size: 16px;
+}
+
+.ocr-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ocr-actions .btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+@media (max-width: 480px) {
+  .serving-options {
+    grid-template-columns: 1fr;
+  }
+
+  .serving-option {
+    padding: 10px;
+  }
+
+  .preview-image {
+    max-height: 150px;
+  }
 }

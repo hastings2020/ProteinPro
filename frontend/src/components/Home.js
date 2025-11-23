@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaEdit, FaTrash, FaBolt } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaBolt, FaCopy, FaCalendar, FaStar, FaRegStar } from 'react-icons/fa';
 import './Home.css';
-import { fetchEntriesByDate, addEntry, deleteEntry, updateEntry } from '../services/api';
+import { fetchEntriesByDate, addEntry, deleteEntry, updateEntry, addFavorite } from '../services/api';
 import AddEntryModal from './AddEntryModal';
 import QuickAddModal from './QuickAddModal';
 import Notification from './Notification';
@@ -13,16 +13,16 @@ const Home = ({ user }) => {
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [notification, setNotification] = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
-
-  const today = new Date().toISOString().split('T')[0];
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [showCopyMenu, setShowCopyMenu] = useState(false);
 
   useEffect(() => {
     if (user && user.id) {
-      loadTodayEntries();
+      loadEntries();
     }
-  }, [user]);
+  }, [user, selectedDate]);
 
-  const loadTodayEntries = async () => {
+  const loadEntries = async () => {
     if (!user || !user.id) {
       setLoading(false);
       return;
@@ -30,7 +30,7 @@ const Home = ({ user }) => {
 
     try {
       setLoading(true);
-      const data = await fetchEntriesByDate(user.id, today);
+      const data = await fetchEntriesByDate(user.id, selectedDate);
       setEntries(data);
     } catch (error) {
       console.error('Error loading entries:', error);
@@ -53,7 +53,8 @@ const Home = ({ user }) => {
       const newEntry = await addEntry({
         ...entryData,
         user_id: user.id,
-        entry_date: today
+        entry_date: selectedDate,
+        quantity: entryData.quantity || 1
       });
       setEntries([...entries, newEntry]);
       setShowAddModal(false);
@@ -101,15 +102,75 @@ const Home = ({ user }) => {
     }
   };
 
-  const showNotification = (message, type) => {
-    setNotification({ message, type });
-    setTimeout(() => setNotification(null), 5000);
+  const handleUpdateQuantity = async (entry, newQuantity) => {
+    if (newQuantity < 1) return;
+
+    try {
+      const updated = await updateEntry(entry.id, {
+        ...entry,
+        quantity: newQuantity,
+        protein_grams: (entry.protein_grams / (entry.quantity || 1)) * newQuantity,
+        calories: entry.calories ? (entry.calories / (entry.quantity || 1)) * newQuantity : null,
+        carbs: entry.carbs ? (entry.carbs / (entry.quantity || 1)) * newQuantity : null,
+        fat: entry.fat ? (entry.fat / (entry.quantity || 1)) * newQuantity : null,
+      });
+      setEntries(entries.map(e => e.id === entry.id ? updated : e));
+      showNotification('Quantity updated!', 'success');
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+      showNotification('Failed to update quantity', 'error');
+    }
   };
 
-  const totalProtein = entries.reduce((sum, entry) => sum + parseFloat(entry.protein_grams || 0), 0);
-  const target = user?.daily_protein_target || 150;
-  const progressPercentage = Math.min((totalProtein / target) * 100, 100);
-  const remaining = Math.max(target - totalProtein, 0);
+  const handleCopyEntry = async (entry, targetDate) => {
+    try {
+      const newEntry = await addEntry({
+        ...entry,
+        user_id: user.id,
+        entry_date: targetDate,
+        id: undefined
+      });
+      if (targetDate === selectedDate) {
+        setEntries([...entries, newEntry]);
+      }
+      showNotification(`Entry copied to ${targetDate}!`, 'success');
+      setShowCopyMenu(false);
+    } catch (error) {
+      console.error('Error copying entry:', error);
+      showNotification('Failed to copy entry', 'error');
+    }
+  };
+
+  const handleAddToFavorites = async (entry) => {
+    try {
+      await addFavorite({
+        user_id: user.id,
+        food_name: entry.food_name,
+        protein_grams: entry.protein_grams / (entry.quantity || 1), // Store per-serving amount
+        calories: entry.calories ? entry.calories / (entry.quantity || 1) : null,
+        serving_size: entry.serving_size
+      });
+      showNotification('Added to favorites!', 'success');
+    } catch (error) {
+      console.error('Error adding to favorites:', error);
+      showNotification('Failed to add to favorites', 'error');
+    }
+  };
+
+  const getCopyOptions = () => {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const lastWeek = new Date(today);
+    lastWeek.setDate(lastWeek.getDate() - 7);
+
+    return [
+      { label: 'Today', date: today.toISOString().split('T')[0] },
+      { label: 'Yesterday', date: yesterday.toISOString().split('T')[0] },
+      { label: 'Last Week', date: lastWeek.toISOString().split('T')[0] }
+    ];
+  };
 
   const openEditModal = (entry) => {
     setEditingEntry(entry);
@@ -121,6 +182,11 @@ const Home = ({ user }) => {
     setShowAddModal(true);
   };
 
+  const showNotification = (message, type) => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 5000);
+  };
+
   if (!user) {
     return (
       <div className="page home-page">
@@ -129,22 +195,50 @@ const Home = ({ user }) => {
     );
   }
 
+  const target = user.daily_protein_target || 150;
+  const totalProtein = entries.reduce((sum, entry) => sum + (parseFloat(entry.protein_grams) || 0), 0);
+  const remaining = target - totalProtein;
+  const progressPercentage = Math.min((totalProtein / target) * 100, 100);
+
+  // Goal status indicator
+  const getGoalStatus = () => {
+    const percentage = (totalProtein / target) * 100;
+    if (percentage >= 100) return { emoji: '🎉', color: '#4caf50', text: 'Goal Achieved!' };
+    if (percentage >= 80) return { emoji: '💪', color: '#ff9800', text: 'Almost There!' };
+    if (percentage >= 50) return { emoji: '👍', color: '#2196f3', text: 'Making Progress!' };
+    return { emoji: '🚀', color: '#9e9e9e', text: 'Keep Going!' };
+  };
+
+  const goalStatus = getGoalStatus();
+
   return (
     <div className="page home-page">
-      <div className="page-header">
-        <h1 className="page-title">Today's Progress</h1>
-        <p className="page-subtitle">{new Date().toLocaleDateString('en-US', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        })}</p>
+      <h1 className="page-title">Daily Protein Tracker</h1>
+
+      {/* Date Selector */}
+      <div className="date-selector">
+        <FaCalendar />
+        <input
+          type="date"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+          max={new Date().toISOString().split('T')[0]}
+          className="date-input"
+        />
+        <span className="date-label">
+          {selectedDate === new Date().toISOString().split('T')[0] ? 'Today' : selectedDate}
+        </span>
       </div>
 
-      {/* Protein Progress Circle */}
-      <div className="card protein-progress-card">
-        <div className="progress-circle-container">
-          <svg className="progress-circle" viewBox="0 0 200 200">
+      {/* Progress Circle with Goal Status */}
+      <div className="progress-card">
+        <div className="goal-status-banner" style={{ backgroundColor: goalStatus.color }}>
+          <span className="goal-emoji">{goalStatus.emoji}</span>
+          <span className="goal-text">{goalStatus.text}</span>
+        </div>
+
+        <div className="progress-circle">
+          <svg width="200" height="200" viewBox="0 0 200 200">
             <circle
               className="progress-circle-bg"
               cx="100"
@@ -158,6 +252,7 @@ const Home = ({ user }) => {
               r="85"
               strokeDasharray={`${progressPercentage * 5.34} 534`}
               strokeDashoffset="0"
+              style={{ stroke: goalStatus.color }}
             />
           </svg>
           <div className="progress-text">
@@ -170,7 +265,9 @@ const Home = ({ user }) => {
         <div className="progress-stats">
           <div className="stat">
             <span className="stat-label">Remaining</span>
-            <span className="stat-value">{Math.round(remaining)}g</span>
+            <span className="stat-value" style={{ color: remaining < 0 ? goalStatus.color : '#666' }}>
+              {Math.abs(Math.round(remaining))}g {remaining < 0 ? 'over' : ''}
+            </span>
           </div>
           <div className="stat">
             <span className="stat-label">Entries</span>
@@ -193,41 +290,105 @@ const Home = ({ user }) => {
         </button>
       </div>
 
-      {/* Today's Entries */}
+      {/* Today's Entries - Compact View */}
       <div className="card">
-        <h2 className="card-header">Today's Foods</h2>
+        <h2 className="card-header">
+          {selectedDate === new Date().toISOString().split('T')[0] ? "Today's Foods" : `Foods for ${selectedDate}`}
+        </h2>
         {loading ? (
           <div className="loading-text">Loading entries...</div>
         ) : entries.length === 0 ? (
           <div className="empty-state">
-            <p>No entries yet today. Start tracking your protein!</p>
+            <p>No entries yet for this date. Start tracking your protein!</p>
           </div>
         ) : (
-          <div className="entries-list">
+          <div className="entries-list compact">
             {entries.map(entry => (
-              <div key={entry.id} className="entry-item">
-                <div className="entry-main">
-                  <div className="entry-info">
-                    <h3 className="entry-name">{entry.food_name}</h3>
-                    <div className="entry-details">
-                      {entry.serving_size && <span>{entry.serving_size}</span>}
-                      {entry.meal_type && <span className="meal-badge">{entry.meal_type}</span>}
-                      {entry.entry_time && <span>{entry.entry_time.slice(0, 5)}</span>}
-                    </div>
-                  </div>
-                  <div className="entry-protein">
-                    <div className="protein-amount">{entry.protein_grams}g</div>
-                    <div className="protein-label">protein</div>
+              <div key={entry.id} className="entry-item-compact">
+                <div className="entry-left">
+                  <h3 className="entry-name-compact">{entry.food_name}</h3>
+                  <div className="entry-meta">
+                    {entry.serving_size && <span className="serving-badge">{entry.serving_size}</span>}
+                    {entry.meal_type && <span className="meal-badge-small">{entry.meal_type}</span>}
                   </div>
                 </div>
-                <div className="entry-actions">
-                  <button className="btn-icon" onClick={() => openEditModal(entry)} title="Edit">
-                    <FaEdit />
-                  </button>
-                  <button className="btn-icon btn-icon-danger" onClick={() => handleDeleteEntry(entry.id)} title="Delete">
-                    <FaTrash />
-                  </button>
+
+                <div className="entry-middle">
+                  <div className="quantity-control">
+                    <button
+                      className="qty-btn"
+                      onClick={() => handleUpdateQuantity(entry, (entry.quantity || 1) - 1)}
+                    >
+                      -
+                    </button>
+                    <span className="qty-display">x {entry.quantity || 1}</span>
+                    <button
+                      className="qty-btn"
+                      onClick={() => handleUpdateQuantity(entry, (entry.quantity || 1) + 1)}
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
+
+                <div className="entry-right">
+                  <div className="protein-compact">{Math.round(entry.protein_grams)}g</div>
+                  <div className="entry-actions-inline">
+                    <button
+                      className="btn-icon-tiny"
+                      onClick={() => handleAddToFavorites(entry)}
+                      title="Add to favorites"
+                    >
+                      <FaStar />
+                    </button>
+                    <button
+                      className="btn-icon-tiny"
+                      onClick={() => {
+                        setEditingEntry(entry);
+                        setShowCopyMenu(entry.id);
+                      }}
+                      title="Copy to..."
+                    >
+                      <FaCopy />
+                    </button>
+                    <button
+                      className="btn-icon-tiny"
+                      onClick={() => openEditModal(entry)}
+                      title="Edit"
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      className="btn-icon-tiny btn-danger"
+                      onClick={() => handleDeleteEntry(entry.id)}
+                      title="Delete"
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Copy Menu */}
+                {showCopyMenu === entry.id && (
+                  <div className="copy-menu">
+                    <div className="copy-menu-header">Copy to:</div>
+                    {getCopyOptions().map(option => (
+                      <button
+                        key={option.date}
+                        className="copy-option"
+                        onClick={() => handleCopyEntry(entry, option.date)}
+                      >
+                        {option.label} ({option.date})
+                      </button>
+                    ))}
+                    <button
+                      className="copy-option copy-cancel"
+                      onClick={() => setShowCopyMenu(false)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
