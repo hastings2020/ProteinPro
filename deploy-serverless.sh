@@ -132,7 +132,6 @@ echo "📤 Uploading files to S3..."
 
 # Upload all files except HTML with long cache
 aws s3 sync build/ s3://${BUCKET_NAME} \
-    --acl public-read \
     --cache-control "public, max-age=31536000" \
     --exclude "*.html" \
     --exclude "service-worker.js" \
@@ -140,7 +139,6 @@ aws s3 sync build/ s3://${BUCKET_NAME} \
 
 # Upload HTML files with no cache
 aws s3 sync build/ s3://${BUCKET_NAME} \
-    --acl public-read \
     --cache-control "public, max-age=0, must-revalidate" \
     --exclude "*" \
     --include "*.html" \

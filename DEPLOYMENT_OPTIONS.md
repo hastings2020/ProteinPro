@@ -48,7 +48,7 @@ npm run deploy
 cd ../frontend
 echo "REACT_APP_API_URL=https://your-api.execute-api.us-east-1.amazonaws.com/api" > .env.production
 npm run build
-aws s3 sync build/ s3://your-bucket --acl public-read
+aws s3 sync build/ s3://your-bucket
 ```
 
 ### Cost
@@ -123,7 +123,7 @@ eb setenv PORT=5001 USDA_API_KEY=DEMO_KEY
 cd ../frontend
 echo "REACT_APP_API_URL=http://your-eb-url.elasticbeanstalk.com/api" > .env.production
 npm run build
-aws s3 sync build/ s3://your-bucket --acl public-read
+aws s3 sync build/ s3://your-bucket
 ```
 
 ### Cost

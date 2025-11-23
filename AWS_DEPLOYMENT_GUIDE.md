@@ -58,7 +58,7 @@ aws s3 mb s3://proteinpro-app-yourname
 aws s3 website s3://proteinpro-app-yourname --index-document index.html --error-document index.html
 
 # Upload files
-aws s3 sync build/ s3://proteinpro-app-yourname --acl public-read
+aws s3 sync build/ s3://proteinpro-app-yourname
 
 # Get the website URL
 echo "http://proteinpro-app-yourname.s3-website-us-east-1.amazonaws.com"

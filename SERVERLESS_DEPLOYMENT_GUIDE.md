@@ -153,14 +153,12 @@ aws s3 website s3://proteinpro-app-yourname \
 
 # Upload files
 aws s3 sync build/ s3://proteinpro-app-yourname \
-  --acl public-read \
   --cache-control "public, max-age=31536000" \
   --exclude "*.html" \
   --exclude "service-worker.js"
 
 # Upload HTML with no cache
 aws s3 sync build/ s3://proteinpro-app-yourname \
-  --acl public-read \
   --cache-control "public, max-age=0, must-revalidate" \
   --exclude "*" \
   --include "*.html" \
@@ -225,7 +223,7 @@ echo "REACT_APP_API_URL=https://your-prod-api-endpoint/api" > .env.production
 npm run build
 
 # Upload to production S3 bucket
-aws s3 sync build/ s3://proteinpro-app-prod --acl public-read
+aws s3 sync build/ s3://proteinpro-app-prod
 ```
 
 ## Environment Variables
@@ -344,7 +342,7 @@ cd frontend
 npm run build
 
 # Sync to S3
-aws s3 sync build/ s3://your-bucket-name --acl public-read
+aws s3 sync build/ s3://your-bucket-name
 
 # Invalidate CloudFront cache (if using CloudFront)
 aws cloudfront create-invalidation \
