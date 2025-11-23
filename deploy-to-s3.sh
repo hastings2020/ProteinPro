@@ -10,7 +10,7 @@ echo "================================"
 
 # Configuration
 BUCKET_NAME=${1:-"proteinpro-app"}
-REGION=${2:-"us-east-1"}
+REGION=${2:-"ap-southeast-2"}
 PROFILE=${3:-"default"}
 
 echo ""

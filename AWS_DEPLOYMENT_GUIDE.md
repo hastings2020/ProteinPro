@@ -27,7 +27,7 @@ pip install awsebcli --upgrade --user
 cd backend
 
 # Initialize Elastic Beanstalk application
-eb init -p node.js-18 proteinpro-backend --region us-east-1
+eb init -p node.js-18 proteinpro-backend --region ap-southeast-2
 
 # Create environment and deploy
 eb create proteinpro-backend-prod
@@ -37,7 +37,7 @@ eb setenv PORT=5001 USDA_API_KEY=DEMO_KEY NODE_ENV=production
 
 # Get the URL
 eb status
-# Copy the CNAME (e.g., proteinpro-backend-prod.us-east-1.elasticbeanstalk.com)
+# Copy the CNAME (e.g., proteinpro-backend-prod.ap-southeast-2.elasticbeanstalk.com)
 ```
 
 ### Step 3: Deploy Frontend to S3
@@ -61,7 +61,7 @@ aws s3 website s3://proteinpro-app-yourname --index-document index.html --error-
 aws s3 sync build/ s3://proteinpro-app-yourname
 
 # Get the website URL
-echo "http://proteinpro-app-yourname.s3-website-us-east-1.amazonaws.com"
+echo "http://proteinpro-app-yourname.s3-website-ap-southeast-2.amazonaws.com"
 ```
 
 ### Step 4: Update CORS on Backend
@@ -71,7 +71,7 @@ After deployment, update `backend/server.js` to allow your S3 frontend:
 ```javascript
 const cors = require('cors');
 app.use(cors({
-  origin: ['http://proteinpro-app-yourname.s3-website-us-east-1.amazonaws.com'],
+  origin: ['http://proteinpro-app-yourname.s3-website-ap-southeast-2.amazonaws.com'],
   credentials: true
 }));
 ```

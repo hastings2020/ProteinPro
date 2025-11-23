@@ -75,17 +75,17 @@ npm run build
 
 ```bash
 # From project root
-./deploy-to-s3.sh your-bucket-name us-east-1 your-aws-profile
+./deploy-to-s3.sh your-bucket-name ap-southeast-2 your-aws-profile
 
 # Example:
-./deploy-to-s3.sh proteinpro-app us-east-1 default
+./deploy-to-s3.sh proteinpro-app ap-southeast-2 default
 ```
 
 #### Option B: Manual Deployment
 
 1. **Create S3 Bucket**
    ```bash
-   aws s3 mb s3://your-bucket-name --region us-east-1
+   aws s3 mb s3://your-bucket-name --region ap-southeast-2
    ```
 
 2. **Enable Static Website Hosting**
@@ -133,7 +133,7 @@ npm run build
 1. Go to AWS CloudFront Console
 2. Create a new distribution
 3. Configure:
-   - **Origin Domain**: your-bucket-name.s3-website-us-east-1.amazonaws.com
+   - **Origin Domain**: your-bucket-name.s3-website-ap-southeast-2.amazonaws.com
    - **Viewer Protocol Policy**: Redirect HTTP to HTTPS
    - **Price Class**: Choose based on your needs
    - **Custom Error Response**: 404 → /index.html (200)

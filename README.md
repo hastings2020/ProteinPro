@@ -230,10 +230,10 @@ The app is fully responsive and optimized for mobile devices:
 chmod +x deploy-to-s3.sh
 
 # Deploy to S3
-./deploy-to-s3.sh your-bucket-name us-east-1 your-aws-profile
+./deploy-to-s3.sh your-bucket-name ap-southeast-2 your-aws-profile
 
 # Example:
-./deploy-to-s3.sh proteinpro-app us-east-1 default
+./deploy-to-s3.sh proteinpro-app ap-southeast-2 default
 ```
 
 This script will:

@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 // Initialize DynamoDB Client
-const dynamoClient = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
+const dynamoClient = new DynamoDBClient({ region: process.env.AWS_REGION || 'ap-southeast-2' });
 const ddb = DynamoDBDocumentClient.from(dynamoClient);
 
 const USERS_TABLE = process.env.USERS_TABLE;

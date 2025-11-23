@@ -46,7 +46,7 @@ npm run deploy
 # Copy API endpoint
 
 cd ../frontend
-echo "REACT_APP_API_URL=https://your-api.execute-api.us-east-1.amazonaws.com/api" > .env.production
+echo "REACT_APP_API_URL=https://your-api.execute-api.ap-southeast-2.amazonaws.com/api" > .env.production
 npm run build
 aws s3 sync build/ s3://your-bucket
 ```

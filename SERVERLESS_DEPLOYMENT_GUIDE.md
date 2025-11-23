@@ -60,7 +60,7 @@ aws configure
 # Enter your:
 # - AWS Access Key ID
 # - AWS Secret Access Key
-# - Default region (e.g., us-east-1)
+# - Default region (e.g., ap-southeast-2)
 ```
 
 ## Step 3: Install Backend Dependencies
@@ -99,7 +99,7 @@ This will:
 ```
 ✔ Service deployed to stack proteinpro-backend-dev
 
-endpoint: https://abc123xyz.execute-api.us-east-1.amazonaws.com
+endpoint: https://abc123xyz.execute-api.ap-southeast-2.amazonaws.com
 functions:
   api: proteinpro-backend-dev-api
 ```
@@ -110,7 +110,7 @@ functions:
 
 ```bash
 # Test health endpoint
-curl https://your-api-endpoint.execute-api.us-east-1.amazonaws.com/api/health
+curl https://your-api-endpoint.execute-api.ap-southeast-2.amazonaws.com/api/health
 
 # Should return: {"status":"ok","message":"ProteinPro API is running (Serverless)"}
 ```
@@ -122,7 +122,7 @@ curl https://your-api-endpoint.execute-api.us-east-1.amazonaws.com/api/health
 ```bash
 # Update with your API endpoint
 cd frontend
-echo "REACT_APP_API_URL=https://your-api-endpoint.execute-api.us-east-1.amazonaws.com/api" > .env.production
+echo "REACT_APP_API_URL=https://your-api-endpoint.execute-api.ap-southeast-2.amazonaws.com/api" > .env.production
 
 # Build
 npm run build
@@ -138,13 +138,13 @@ cd ..
 cd frontend
 
 # Create production env file
-echo "REACT_APP_API_URL=https://your-api-endpoint.execute-api.us-east-1.amazonaws.com/api" > .env.production
+echo "REACT_APP_API_URL=https://your-api-endpoint.execute-api.ap-southeast-2.amazonaws.com/api" > .env.production
 
 # Build
 npm run build
 
 # Create S3 bucket (choose unique name)
-aws s3 mb s3://proteinpro-app-yourname --region us-east-1
+aws s3 mb s3://proteinpro-app-yourname --region ap-southeast-2
 
 # Enable website hosting
 aws s3 website s3://proteinpro-app-yourname \
@@ -165,7 +165,7 @@ aws s3 sync build/ s3://proteinpro-app-yourname \
   --include "service-worker.js"
 
 # Get website URL
-echo "http://proteinpro-app-yourname.s3-website-us-east-1.amazonaws.com"
+echo "http://proteinpro-app-yourname.s3-website-ap-southeast-2.amazonaws.com"
 ```
 
 ## Step 7: (Optional) Set Up CloudFront for HTTPS
@@ -179,7 +179,7 @@ CloudFront provides:
 ```bash
 # Create CloudFront distribution
 aws cloudfront create-distribution \
-  --origin-domain-name proteinpro-app-yourname.s3-website-us-east-1.amazonaws.com \
+  --origin-domain-name proteinpro-app-yourname.s3-website-ap-southeast-2.amazonaws.com \
   --default-root-object index.html
 
 # This takes 15-20 minutes to deploy
@@ -488,7 +488,7 @@ Add Lambda@Edge function for security headers (optional).
 aws acm request-certificate \
   --domain-name api.yourdomain.com \
   --validation-method DNS \
-  --region us-east-1
+  --region ap-southeast-2
 ```
 
 ### 3. Configure Custom Domain in API Gateway

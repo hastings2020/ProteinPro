@@ -94,7 +94,7 @@ npm run build
 
 # Create S3 bucket name
 BUCKET_NAME="proteinpro-app-${STAGE}-$(date +%s)"
-REGION="us-east-1"
+REGION="ap-southeast-2"
 
 echo "📦 Creating S3 bucket: $BUCKET_NAME"
 
