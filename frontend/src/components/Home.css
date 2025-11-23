@@ -172,6 +172,24 @@
   white-space: nowrap;
 }
 
+/* Entries Hint */
+.entries-hint {
+  background: #e8f5e9;
+  border-left: 3px solid #4caf50;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #2e7d32;
+  display: flex;
+  align-items: center;
+}
+
+.entries-hint strong {
+  color: #1b5e20;
+  margin: 0 3px;
+}
+
 /* Compact Entries List */
 .entries-list.compact {
   display: flex;

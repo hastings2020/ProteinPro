@@ -46,6 +46,7 @@ const Analytics = ({ user }) => {
       setAnalyticsData(data);
     } catch (error) {
       console.error('Error loading analytics:', error);
+      setAnalyticsData({ dailyData: [], statistics: { avgProtein: 0, daysMetGoal: 0, goalPercentage: 0, currentStreak: 0, target: user?.daily_protein_target || 150, totalDays: 0 } });
     } finally {
       setLoading(false);
     }
@@ -212,6 +213,7 @@ const Analytics = ({ user }) => {
   }
 
   const stats = analyticsData?.statistics || {};
+  const hasData = analyticsData?.dailyData && analyticsData.dailyData.length > 0;
 
   return (
     <div className="page analytics-page">
@@ -220,6 +222,17 @@ const Analytics = ({ user }) => {
         <p className="page-subtitle">Track your progress and insights</p>
       </div>
 
+      {!hasData && !loading && (
+        <div className="empty-state-analytics">
+          <div className="empty-icon">📊</div>
+          <h3>No Data Yet</h3>
+          <p>Start tracking your protein intake to see analytics and insights!</p>
+          <p className="empty-hint">Analytics will show here once you add some entries.</p>
+        </div>
+      )}
+
+      {hasData && (
+        <>
       {/* Period Selector */}
       <div className="period-selector">
         <button
@@ -298,6 +311,8 @@ const Analytics = ({ user }) => {
       <button className="btn btn-secondary export-btn" onClick={handleExport}>
         <FaDownload /> Export Data as CSV
       </button>
+      </>
+      )}
     </div>
   );
 };

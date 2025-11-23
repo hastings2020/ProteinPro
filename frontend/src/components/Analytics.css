@@ -121,6 +121,39 @@
   margin-top: 12px;
 }
 
+/* Empty State */
+.empty-state-analytics {
+  background: white;
+  border-radius: 16px;
+  padding: 60px 40px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.empty-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+}
+
+.empty-state-analytics h3 {
+  font-size: 24px;
+  color: #1a1a1a;
+  margin-bottom: 12px;
+}
+
+.empty-state-analytics p {
+  color: #666;
+  font-size: 16px;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.empty-hint {
+  font-size: 14px;
+  color: #999;
+  font-style: italic;
+}
+
 @media (max-width: 768px) {
   .stats-grid {
     grid-template-columns: 1fr;

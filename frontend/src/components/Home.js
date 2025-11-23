@@ -264,9 +264,9 @@ const Home = ({ user }) => {
 
         <div className="progress-stats">
           <div className="stat">
-            <span className="stat-label">Remaining</span>
-            <span className="stat-value" style={{ color: remaining < 0 ? goalStatus.color : '#666' }}>
-              {Math.abs(Math.round(remaining))}g {remaining < 0 ? 'over' : ''}
+            <span className="stat-label">{remaining < 0 ? 'Over Target' : 'Remaining'}</span>
+            <span className="stat-value" style={{ color: remaining < 0 ? goalStatus.color : '#667eea' }}>
+              {remaining < 0 ? '+' : ''}{Math.abs(Math.round(remaining))}g
             </span>
           </div>
           <div className="stat">
@@ -275,7 +275,7 @@ const Home = ({ user }) => {
           </div>
           <div className="stat">
             <span className="stat-label">Calories</span>
-            <span className="stat-value">{entries.reduce((sum, e) => sum + (e.calories || 0), 0)}</span>
+            <span className="stat-value">{Math.round(entries.reduce((sum, e) => sum + (e.calories || 0), 0))}</span>
           </div>
         </div>
       </div>
@@ -295,6 +295,12 @@ const Home = ({ user }) => {
         <h2 className="card-header">
           {selectedDate === new Date().toISOString().split('T')[0] ? "Today's Foods" : `Foods for ${selectedDate}`}
         </h2>
+        {entries.length > 0 && (
+          <div className="entries-hint">
+            <FaCopy style={{ marginRight: '6px' }} />
+            Tip: Click <strong>copy icon</strong> on any entry to repeat it on another day
+          </div>
+        )}
         {loading ? (
           <div className="loading-text">Loading entries...</div>
         ) : entries.length === 0 ? (
