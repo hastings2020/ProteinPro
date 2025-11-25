@@ -163,8 +163,8 @@ app.get('/api/entries/:userId/daily-totals', async (req, res) => {
     const query = `
       SELECT
         DATE(entry_date) as entry_date,
-        SUM(protein_grams * quantity) as total_protein,
-        SUM(calories * quantity) as total_calories,
+        SUM(protein_grams) as total_protein,
+        SUM(calories) as total_calories,
         COUNT(*) as entry_count
       FROM food_entries
       WHERE user_id = ? AND DATE(entry_date) >= DATE(?) AND DATE(entry_date) <= DATE(?)
@@ -190,8 +190,8 @@ app.get('/api/analytics/:userId', async (req, res) => {
     const dailyQuery = `
       SELECT
         entry_date,
-        SUM(protein_grams * quantity) as total_protein,
-        SUM(calories * quantity) as total_calories,
+        SUM(protein_grams) as total_protein,
+        SUM(calories) as total_calories,
         COUNT(*) as entry_count
       FROM food_entries
       WHERE user_id = ? AND entry_date BETWEEN ? AND ?

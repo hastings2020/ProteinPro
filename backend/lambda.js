@@ -173,7 +173,7 @@ app.get('/api/entries/:userId/daily-totals', async (req, res) => {
       }
     }));
 
-    // Group by date and multiply by quantity
+    // Group by date (protein_grams already includes quantity)
     const dailyTotals = {};
     (result.Items || []).forEach(entry => {
       if (!dailyTotals[entry.entry_date]) {
@@ -184,9 +184,8 @@ app.get('/api/entries/:userId/daily-totals', async (req, res) => {
           entry_count: 0
         };
       }
-      const quantity = parseInt(entry.quantity) || 1;
-      dailyTotals[entry.entry_date].total_protein += (parseFloat(entry.protein_grams) || 0) * quantity;
-      dailyTotals[entry.entry_date].total_calories += (parseFloat(entry.calories) || 0) * quantity;
+      dailyTotals[entry.entry_date].total_protein += parseFloat(entry.protein_grams) || 0;
+      dailyTotals[entry.entry_date].total_calories += parseFloat(entry.calories) || 0;
       dailyTotals[entry.entry_date].entry_count += 1;
     });
 
@@ -317,7 +316,7 @@ app.get('/api/analytics/:userId', async (req, res) => {
 
     const entries = result.Items || [];
 
-    // Group entries by date to create daily data
+    // Group entries by date to create daily data (protein_grams already includes quantity)
     const dailyMap = {};
     entries.forEach(entry => {
       if (!dailyMap[entry.entry_date]) {
@@ -328,9 +327,8 @@ app.get('/api/analytics/:userId', async (req, res) => {
           entry_count: 0
         };
       }
-      const quantity = parseInt(entry.quantity) || 1;
-      dailyMap[entry.entry_date].total_protein += (parseFloat(entry.protein_grams) || 0) * quantity;
-      dailyMap[entry.entry_date].total_calories += (parseFloat(entry.calories) || 0) * quantity;
+      dailyMap[entry.entry_date].total_protein += parseFloat(entry.protein_grams) || 0;
+      dailyMap[entry.entry_date].total_calories += parseFloat(entry.calories) || 0;
       dailyMap[entry.entry_date].entry_count += 1;
     });
 

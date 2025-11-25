@@ -211,6 +211,11 @@
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
 .progress-percentage {
@@ -250,7 +255,7 @@
 .stat-label {
   font-size: 12px;
   font-weight: 600;
-  color: white;
+  color: white !important;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -258,7 +263,7 @@
 .stat-value {
   font-size: 24px;
   font-weight: 700;
-  color: white;
+  color: white !important;
 }
 
 
@@ -842,25 +847,36 @@
 
   .entry-item-compact {
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
   }
 
+  /* Food name takes full width */
   .entry-left {
     flex-basis: 100%;
+    order: 1;
   }
 
+  /* Food name, quantity, and protein in one line */
   .entry-middle {
-    flex: 1;
+    order: 2;
   }
 
   .entry-right {
+    order: 3;
     flex-direction: row;
     align-items: center;
-    gap: 12px;
+  }
+
+  /* Actions buttons on new line */
+  .entry-right .protein-compact {
+    margin-right: auto;
   }
 
   .entry-actions-inline {
-    flex-wrap: wrap;
+    flex-basis: 100%;
+    order: 4;
+    justify-content: flex-end;
+    gap: 6px;
   }
 
   .btn-icon-tiny {
