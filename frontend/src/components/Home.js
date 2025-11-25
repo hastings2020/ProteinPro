@@ -6,6 +6,12 @@ import AddEntryModal from './AddEntryModal';
 import QuickAddModal from './QuickAddModal';
 import Notification from './Notification';
 
+// Helper function to get today's date in YYYY-MM-DD format
+const getTodayString = () => {
+  const today = new Date();
+  return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+};
+
 const Home = ({ user }) => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,7 +19,7 @@ const Home = ({ user }) => {
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [notification, setNotification] = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState(getTodayString());
   const [showCopyMenu, setShowCopyMenu] = useState(false);
   const [showCopyFromModal, setShowCopyFromModal] = useState(false);
   const [copyFromDate, setCopyFromDate] = useState('');
@@ -255,13 +261,22 @@ const Home = ({ user }) => {
   };
 
   const navigateDate = (days) => {
-    const currentDate = new Date(selectedDate + 'T00:00:00');
+    // Parse the selected date correctly
+    const [year, month, day] = selectedDate.split('-').map(Number);
+    const currentDate = new Date(year, month - 1, day); // month is 0-indexed
+
+    // Add/subtract days
     currentDate.setDate(currentDate.getDate() + days);
-    const newDate = currentDate.toISOString().split('T')[0];
-    const today = new Date().toISOString().split('T')[0];
+
+    // Format as YYYY-MM-DD
+    const newYear = currentDate.getFullYear();
+    const newMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const newDay = String(currentDate.getDate()).padStart(2, '0');
+    const newDate = `${newYear}-${newMonth}-${newDay}`;
 
     // Don't allow navigating beyond today
-    if (newDate <= today) {
+    const todayStr = getTodayString();
+    if (newDate <= todayStr) {
       setSelectedDate(newDate);
     }
   };
@@ -386,11 +401,11 @@ const Home = ({ user }) => {
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              max={new Date().toISOString().split('T')[0]}
+              max={getTodayString()}
               className="calendar-date-input"
             />
             <span className="action-label calendar-label">
-              {selectedDate === new Date().toISOString().split('T')[0] ? 'Today' : new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              {selectedDate === getTodayString() ? 'Today' : new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </span>
           </div>
           <button
@@ -399,7 +414,7 @@ const Home = ({ user }) => {
               e.stopPropagation();
               navigateDate(1);
             }}
-            disabled={selectedDate === new Date().toISOString().split('T')[0]}
+            disabled={selectedDate === getTodayString()}
             title="Next day"
           >
             <FaChevronRight />
@@ -410,7 +425,7 @@ const Home = ({ user }) => {
       {/* Today's Entries - Compact View */}
       <div className="card">
         <h2 className="card-header">
-          {selectedDate === new Date().toISOString().split('T')[0] ? "Today's Foods" : `Foods for ${selectedDate}`}
+          {selectedDate === getTodayString() ? "Today's Foods" : `Foods for ${selectedDate}`}
         </h2>
         {entries.length > 0 && (
           <div className="entries-hint">
@@ -584,7 +599,7 @@ const Home = ({ user }) => {
                   type="date"
                   value={copyFromDate}
                   onChange={(e) => handleCopyFromDateChange(e.target.value)}
-                  max={new Date().toISOString().split('T')[0]}
+                  max={getTodayString()}
                   className="date-input"
                 />
               </div>
