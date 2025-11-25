@@ -13,12 +13,16 @@ const Calendar = ({ user }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   useEffect(() => {
-    loadMonthData(currentMonth);
-  }, [currentMonth]);
+    if (user && user.id) {
+      loadMonthData(currentMonth);
+    }
+  }, [currentMonth, user]);
 
   useEffect(() => {
-    loadDayEntries(selectedDate);
-  }, [selectedDate]);
+    if (user && user.id) {
+      loadDayEntries(selectedDate);
+    }
+  }, [selectedDate, user]);
 
   const loadMonthData = async (date) => {
     try {
@@ -26,7 +30,8 @@ const Calendar = ({ user }) => {
       const start = format(startOfMonth(date), 'yyyy-MM-dd');
       const end = format(endOfMonth(date), 'yyyy-MM-dd');
 
-      console.log('Calendar: Fetching data for month:', { start, end });
+      console.log('Calendar: User object:', user);
+      console.log('Calendar: Fetching data for month:', { userId: user.id, start, end });
       const data = await fetchDailyTotals(user.id, start, end);
       console.log('Calendar: Received data:', data);
 
@@ -85,7 +90,13 @@ const Calendar = ({ user }) => {
 
     // Debug logging for Nov 18 and 23
     if (dateStr.includes('-11-18') || dateStr.includes('-11-23')) {
-      console.log('Calendar tile:', dateStr, 'dayData:', dayData, 'all totals:', Object.keys(dailyTotals));
+      console.log('Calendar tile for', dateStr, ':', {
+        dateObj: date,
+        dateStr,
+        dayData,
+        allTotalsKeys: Object.keys(dailyTotals),
+        allTotals: dailyTotals
+      });
     }
 
     if (!dayData) return null;
