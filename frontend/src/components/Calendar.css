@@ -137,18 +137,17 @@
 }
 
 .react-calendar__tile--active {
-  background: #667eea !important;
-  color: white !important;
-  border-color: #667eea !important;
-}
-
-.react-calendar__tile--active .tile-protein {
-  color: white !important;
+  box-shadow: 0 0 0 3px #667eea inset !important;
+  font-weight: 700;
 }
 
 .react-calendar__tile--now {
-  background: #fff9c4;
+  box-shadow: 0 0 0 2px #FF9800 inset;
   font-weight: 700;
+}
+
+.react-calendar__tile--now.react-calendar__tile--active {
+  box-shadow: 0 0 0 3px #667eea inset, 0 0 0 6px rgba(255, 152, 0, 0.3) inset !important;
 }
 
 /* Color coding based on goal achievement */

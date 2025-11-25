@@ -646,17 +646,45 @@
 
 .copy-from-date-selector {
   margin-bottom: 20px;
-  padding: 16px;
-  background: #f5f5f5;
-  border-radius: 8px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 12px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .copy-from-date-selector label {
-  font-weight: 500;
+  font-weight: 600;
   color: #333;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.copy-from-date-selector .date-input {
+  padding: 12px 16px;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  background: white;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.copy-from-date-selector .date-input:hover {
+  border-color: #764ba2;
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
+}
+
+.copy-from-date-selector .date-input:focus {
+  outline: none;
+  border-color: #764ba2;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .copy-from-entries {

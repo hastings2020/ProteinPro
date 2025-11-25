@@ -1,13 +1,41 @@
-import React, { useState } from 'react';
-import { FaTimes, FaBolt } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaTimes, FaBolt, FaStar } from 'react-icons/fa';
 import './QuickAddModal.css';
+import { fetchFavorites } from '../services/api';
 
-const QuickAddModal = ({ onClose, onSubmit }) => {
+const QuickAddModal = ({ onClose, onSubmit, user }) => {
   const [formData, setFormData] = useState({
     food_name: '',
     protein_grams: '',
     meal_type: ''
   });
+  const [favorites, setFavorites] = useState([]);
+  const [showFavorites, setShowFavorites] = useState(false);
+
+  useEffect(() => {
+    if (user && user.id) {
+      loadFavorites();
+    }
+  }, [user]);
+
+  const loadFavorites = async () => {
+    try {
+      const data = await fetchFavorites(user.id);
+      setFavorites(data);
+      setShowFavorites(data.length > 0);
+    } catch (error) {
+      console.error('Error loading favorites:', error);
+    }
+  };
+
+  const selectFavorite = (favorite) => {
+    setFormData({
+      food_name: favorite.food_name,
+      protein_grams: favorite.protein_grams,
+      meal_type: formData.meal_type
+    });
+    setShowFavorites(false);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,6 +74,33 @@ const QuickAddModal = ({ onClose, onSubmit }) => {
           <p className="quick-add-description">
             Quickly log your protein intake with just the essentials
           </p>
+
+          {favorites.length > 0 && showFavorites && (
+            <div className="quick-favorites-section">
+              <div className="quick-favorites-header">
+                <FaStar className="star-icon-gold" />
+                <span>Quick Select from Favorites:</span>
+              </div>
+              <div className="quick-favorites-list">
+                {favorites.slice(0, 5).map((fav) => (
+                  <button
+                    key={fav.id}
+                    type="button"
+                    className="quick-favorite-item"
+                    onClick={() => selectFavorite(fav)}
+                  >
+                    <span className="fav-name">{fav.food_name}</span>
+                    <span className="fav-protein">{fav.protein_grams}g</span>
+                  </button>
+                ))}
+              </div>
+              {favorites.length > 5 && (
+                <div className="favorites-more">
+                  +{favorites.length - 5} more favorites available
+                </div>
+              )}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">

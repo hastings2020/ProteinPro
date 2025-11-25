@@ -568,6 +568,7 @@ const Home = ({ user }) => {
         <QuickAddModal
           onClose={() => setShowQuickAdd(false)}
           onSubmit={handleAddEntry}
+          user={user}
         />
       )}
 

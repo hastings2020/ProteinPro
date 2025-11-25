@@ -237,26 +237,26 @@ const History = ({ user }) => {
                         <div className="entry-protein">
                           <div className="protein-amount">{entry.protein_grams}g</div>
                         </div>
+                        <div className="entry-actions">
+                          <button
+                            className="btn-icon"
+                            onClick={() => {
+                              setEditingEntry(entry);
+                              setShowEditModal(true);
+                            }}
+                            title="Edit"
+                          >
+                            <FaEdit />
+                          </button>
+                          <button
+                            className="btn-icon btn-icon-danger"
+                            onClick={() => handleDeleteEntry(entry.id)}
+                            title="Delete"
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                    <div className="entry-actions">
-                      <button
-                        className="btn-icon"
-                        onClick={() => {
-                          setEditingEntry(entry);
-                          setShowEditModal(true);
-                        }}
-                        title="Edit"
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        className="btn-icon btn-icon-danger"
-                        onClick={() => handleDeleteEntry(entry.id)}
-                        title="Delete"
-                      >
-                        <FaTrash />
-                      </button>
                     </div>
                   </div>
                 ))}

@@ -144,7 +144,6 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 8px;
 }
 
 .entry-left {
@@ -189,6 +188,10 @@
 }
 
 .entry-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
   margin-left: 16px;
 }
 
@@ -201,10 +204,8 @@
 
 .entry-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   justify-content: flex-end;
-  padding-top: 8px;
-  border-top: 1px solid #e0e0e0;
 }
 
 @media (max-width: 768px) {

@@ -26,6 +26,76 @@
   gap: 10px;
 }
 
+/* Quick Favorites Section */
+.quick-favorites-section {
+  background: linear-gradient(135deg, #fffbf0 0%, #fff9e6 100%);
+  border: 2px solid #ffd700;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.quick-favorites-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.star-icon-gold {
+  color: #ffd700;
+  font-size: 16px;
+}
+
+.quick-favorites-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quick-favorite-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: white;
+  border: 2px solid #ffd700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  text-align: left;
+}
+
+.quick-favorite-item:hover {
+  background: #fffbf0;
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+}
+
+.quick-favorite-item .fav-name {
+  font-weight: 600;
+  color: #333;
+  flex: 1;
+}
+
+.quick-favorite-item .fav-protein {
+  font-weight: 700;
+  color: #667eea;
+  font-size: 16px;
+}
+
+.favorites-more {
+  text-align: center;
+  font-size: 12px;
+  color: #999;
+  margin-top: 8px;
+  font-style: italic;
+}
+
 @media (max-width: 480px) {
   .protein-input-large {
     font-size: 28px;
