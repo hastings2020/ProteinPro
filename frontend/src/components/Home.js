@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaEdit, FaTrash, FaBolt, FaCopy, FaCalendar, FaStar, FaRegStar } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaBolt, FaCopy, FaCalendar, FaStar, FaRegStar, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import './Home.css';
 import { fetchEntriesByDate, addEntry, deleteEntry, updateEntry, addFavorite } from '../services/api';
 import AddEntryModal from './AddEntryModal';
@@ -254,6 +254,18 @@ const Home = ({ user }) => {
     setTimeout(() => setNotification(null), 5000);
   };
 
+  const navigateDate = (days) => {
+    const currentDate = new Date(selectedDate + 'T00:00:00');
+    currentDate.setDate(currentDate.getDate() + days);
+    const newDate = currentDate.toISOString().split('T')[0];
+    const today = new Date().toISOString().split('T')[0];
+
+    // Don't allow navigating beyond today
+    if (newDate <= today) {
+      setSelectedDate(newDate);
+    }
+  };
+
   if (!user) {
     return (
       <div className="page home-page">
@@ -354,19 +366,42 @@ const Home = ({ user }) => {
           <span className="action-label">Repeat</span>
         </div>
         <div className="action-pane calendar-pane">
-          <div className="action-icon">
-            <FaCalendar />
+          <button
+            className="date-nav-btn date-nav-left"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigateDate(-1);
+            }}
+            title="Previous day"
+          >
+            <FaChevronLeft />
+          </button>
+          <div className="calendar-content">
+            <div className="action-icon">
+              <FaCalendar />
+            </div>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              max={new Date().toISOString().split('T')[0]}
+              className="calendar-date-input"
+            />
+            <span className="action-label calendar-label">
+              {selectedDate === new Date().toISOString().split('T')[0] ? 'Today' : new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            </span>
           </div>
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            max={new Date().toISOString().split('T')[0]}
-            className="calendar-date-input"
-          />
-          <span className="action-label calendar-label">
-            {selectedDate === new Date().toISOString().split('T')[0] ? 'Today' : new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-          </span>
+          <button
+            className="date-nav-btn date-nav-right"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigateDate(1);
+            }}
+            disabled={selectedDate === new Date().toISOString().split('T')[0]}
+            title="Next day"
+          >
+            <FaChevronRight />
+          </button>
         </div>
       </div>
 

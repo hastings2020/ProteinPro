@@ -58,17 +58,70 @@
 /* Modern Calendar Pane */
 .calendar-pane {
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.calendar-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex: 1;
+  position: relative;
+}
+
+.date-nav-btn {
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  flex-shrink: 0;
+  backdrop-filter: blur(10px);
+}
+
+.date-nav-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.5);
+  transform: scale(1.1);
+}
+
+.date-nav-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.date-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .calendar-date-input {
   position: absolute;
-  opacity: 0;
+  opacity: 1;
   width: 100%;
   height: 100%;
   top: 0;
   left: 0;
   cursor: pointer;
   z-index: 10;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  padding: 10px;
 }
 
 .calendar-label {
@@ -181,15 +234,15 @@
 
 .stat {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+  gap: 6px;
 }
 
 .stat-label {
   font-size: 12px;
   font-weight: 600;
-  opacity: 1;
-  margin-bottom: 4px;
+  opacity: 0.7;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -197,6 +250,7 @@
 .stat-value {
   font-size: 24px;
   font-weight: 700;
+  opacity: 0.85;
 }
 
 
