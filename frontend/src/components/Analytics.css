@@ -115,6 +115,74 @@
   position: relative;
 }
 
+/* Custom Date Range */
+.custom-date-range {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.date-range-inputs {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.date-range-input {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.date-range-input label {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.date-range-input .date-input {
+  border: 2px solid #e0e0e0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.date-range-input .date-input:hover {
+  border-color: #667eea;
+}
+
+.date-range-input .date-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.apply-date-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  width: 100%;
+}
+
+.apply-date-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
 /* Export Button */
 .export-btn {
   width: 100%;
@@ -178,6 +246,19 @@
   }
 
   .period-selector {
+    flex-wrap: wrap;
+  }
+
+  .period-btn {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 120px;
+  }
+
+  .date-range-inputs {
     flex-direction: column;
+  }
+
+  .date-range-input {
+    min-width: 100%;
   }
 }

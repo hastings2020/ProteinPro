@@ -514,6 +514,157 @@
   color: #999;
 }
 
+/* Copy From Modal */
+.copy-from-modal {
+  max-width: 600px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.copy-from-modal .modal-body {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.copy-from-date-selector {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.copy-from-date-selector label {
+  font-weight: 500;
+  color: #333;
+}
+
+.copy-from-entries {
+  margin-top: 16px;
+}
+
+.copy-from-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.copy-from-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.copy-from-entry {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.copy-from-entry:hover {
+  border-color: #667eea;
+  background: #f5f5f5;
+}
+
+.copy-from-entry.selected {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.copy-from-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #667eea;
+}
+
+.copy-from-entry-details {
+  flex: 1;
+}
+
+.copy-from-entry-name {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.copy-from-entry-meta {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  color: #666;
+  flex-wrap: wrap;
+}
+
+.copy-from-entry-meta span {
+  background: #e0e0e0;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.copy-from-entry-protein {
+  font-size: 18px;
+  font-weight: 700;
+  color: #667eea;
+}
+
+.copy-from-summary {
+  margin-top: 16px;
+  padding: 12px;
+  background: #e8f0fe;
+  border-radius: 8px;
+  text-align: center;
+  color: #1967d2;
+  font-size: 14px;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: #667eea;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 8px;
+  text-decoration: underline;
+}
+
+.btn-link:hover {
+  color: #764ba2;
+}
+
+.btn-copy-from {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-copy-from:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
 /* Responsive Design */
 @media (max-width: 640px) {
   .entry-item-compact {

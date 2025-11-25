@@ -15,6 +15,10 @@ const Home = ({ user }) => {
   const [editingEntry, setEditingEntry] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [showCopyMenu, setShowCopyMenu] = useState(false);
+  const [showCopyFromModal, setShowCopyFromModal] = useState(false);
+  const [copyFromDate, setCopyFromDate] = useState('');
+  const [copyFromEntries, setCopyFromEntries] = useState([]);
+  const [selectedCopyFromEntries, setSelectedCopyFromEntries] = useState([]);
 
   useEffect(() => {
     if (user && user.id) {
@@ -157,6 +161,68 @@ const Home = ({ user }) => {
     }
   };
 
+  const handleOpenCopyFrom = () => {
+    // Set default date to yesterday
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+    setCopyFromDate(yesterdayStr);
+    loadCopyFromEntries(yesterdayStr);
+    setShowCopyFromModal(true);
+  };
+
+  const loadCopyFromEntries = async (date) => {
+    try {
+      const data = await fetchEntriesByDate(user.id, date);
+      setCopyFromEntries(data);
+      setSelectedCopyFromEntries([]);
+    } catch (error) {
+      console.error('Error loading entries from date:', error);
+      showNotification('Failed to load entries from selected date', 'error');
+    }
+  };
+
+  const handleCopyFromDateChange = (date) => {
+    setCopyFromDate(date);
+    loadCopyFromEntries(date);
+  };
+
+  const toggleCopyFromEntry = (entryId) => {
+    setSelectedCopyFromEntries(prev =>
+      prev.includes(entryId)
+        ? prev.filter(id => id !== entryId)
+        : [...prev, entryId]
+    );
+  };
+
+  const handleCopySelectedEntries = async () => {
+    if (selectedCopyFromEntries.length === 0) {
+      showNotification('Please select at least one entry to copy', 'warning');
+      return;
+    }
+
+    try {
+      const entriesToCopy = copyFromEntries.filter(e => selectedCopyFromEntries.includes(e.id));
+
+      for (const entry of entriesToCopy) {
+        await addEntry({
+          ...entry,
+          user_id: user.id,
+          entry_date: selectedDate,
+          id: undefined,
+          created_at: undefined
+        });
+      }
+
+      await loadEntries();
+      setShowCopyFromModal(false);
+      showNotification(`Successfully copied ${entriesToCopy.length} entries to ${selectedDate}!`, 'success');
+    } catch (error) {
+      console.error('Error copying entries:', error);
+      showNotification('Failed to copy entries', 'error');
+    }
+  };
+
   const getCopyOptions = () => {
     const today = new Date();
     const yesterday = new Date(today);
@@ -287,6 +353,9 @@ const Home = ({ user }) => {
         </button>
         <button className="btn btn-primary btn-add-food" onClick={openAddModal}>
           <FaPlus /> Full Entry
+        </button>
+        <button className="btn btn-secondary btn-copy-from" onClick={handleOpenCopyFrom}>
+          <FaCopy /> Copy From...
         </button>
       </div>
 
@@ -420,6 +489,99 @@ const Home = ({ user }) => {
           editingEntry={editingEntry}
           user={user}
         />
+      )}
+
+      {/* Copy From Modal */}
+      {showCopyFromModal && (
+        <div className="modal-overlay" onClick={() => setShowCopyFromModal(false)}>
+          <div className="modal copy-from-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Copy Entries From...</h2>
+              <button className="modal-close" onClick={() => setShowCopyFromModal(false)}>×</button>
+            </div>
+            <div className="modal-body">
+              <div className="copy-from-date-selector">
+                <label>Select Date:</label>
+                <input
+                  type="date"
+                  value={copyFromDate}
+                  onChange={(e) => handleCopyFromDateChange(e.target.value)}
+                  max={new Date().toISOString().split('T')[0]}
+                  className="date-input"
+                />
+              </div>
+
+              {copyFromEntries.length === 0 ? (
+                <div className="empty-state">
+                  <p>No entries found for {copyFromDate}</p>
+                </div>
+              ) : (
+                <>
+                  <div className="copy-from-entries">
+                    <div className="copy-from-header">
+                      <h3>Select entries to copy to {selectedDate}:</h3>
+                      <button
+                        className="btn btn-link"
+                        onClick={() => {
+                          if (selectedCopyFromEntries.length === copyFromEntries.length) {
+                            setSelectedCopyFromEntries([]);
+                          } else {
+                            setSelectedCopyFromEntries(copyFromEntries.map(e => e.id));
+                          }
+                        }}
+                      >
+                        {selectedCopyFromEntries.length === copyFromEntries.length ? 'Deselect All' : 'Select All'}
+                      </button>
+                    </div>
+
+                    {copyFromEntries.map(entry => (
+                      <div
+                        key={entry.id}
+                        className={`copy-from-entry ${selectedCopyFromEntries.includes(entry.id) ? 'selected' : ''}`}
+                        onClick={() => toggleCopyFromEntry(entry.id)}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedCopyFromEntries.includes(entry.id)}
+                          onChange={() => {}}
+                          className="copy-from-checkbox"
+                        />
+                        <div className="copy-from-entry-details">
+                          <div className="copy-from-entry-name">{entry.food_name}</div>
+                          <div className="copy-from-entry-meta">
+                            {entry.serving_size && <span>{entry.serving_size}</span>}
+                            {entry.meal_type && <span className="meal-badge-small">{entry.meal_type}</span>}
+                            {entry.quantity && entry.quantity > 1 && <span>x{entry.quantity}</span>}
+                          </div>
+                        </div>
+                        <div className="copy-from-entry-protein">{Math.round(entry.protein_grams)}g</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="copy-from-summary">
+                    <strong>{selectedCopyFromEntries.length}</strong> entries selected
+                    {selectedCopyFromEntries.length > 0 && (
+                      <span> • Total: {Math.round(copyFromEntries.filter(e => selectedCopyFromEntries.includes(e.id)).reduce((sum, e) => sum + e.protein_grams, 0))}g protein</span>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={() => setShowCopyFromModal(false)}>
+                Cancel
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={handleCopySelectedEntries}
+                disabled={selectedCopyFromEntries.length === 0}
+              >
+                Copy {selectedCopyFromEntries.length > 0 ? `${selectedCopyFromEntries.length} ` : ''}Entries
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Notification */}

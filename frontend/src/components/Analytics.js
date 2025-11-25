@@ -30,9 +30,12 @@ ChartJS.register(
 );
 
 const Analytics = ({ user }) => {
-  const [period, setPeriod] = useState('week'); // week, month, year
+  const [period, setPeriod] = useState('week'); // week, month, 3months, year, custom
   const [analyticsData, setAnalyticsData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [customStartDate, setCustomStartDate] = useState('');
+  const [customEndDate, setCustomEndDate] = useState('');
+  const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
 
   useEffect(() => {
     loadAnalytics();
@@ -65,9 +68,17 @@ const Analytics = ({ user }) => {
         startDate = format(subDays(today, 29), 'yyyy-MM-dd');
         endDate = format(today, 'yyyy-MM-dd');
         break;
+      case '3months':
+        startDate = format(subMonths(today, 3), 'yyyy-MM-dd');
+        endDate = format(today, 'yyyy-MM-dd');
+        break;
       case 'year':
         startDate = format(subMonths(today, 11), 'yyyy-MM-01');
         endDate = format(today, 'yyyy-MM-dd');
+        break;
+      case 'custom':
+        startDate = customStartDate || format(subDays(today, 29), 'yyyy-MM-dd');
+        endDate = customEndDate || format(today, 'yyyy-MM-dd');
         break;
       default:
         startDate = format(subDays(today, 6), 'yyyy-MM-dd');
@@ -75,6 +86,32 @@ const Analytics = ({ user }) => {
     }
 
     return { startDate, endDate };
+  };
+
+  const handlePeriodChange = (newPeriod) => {
+    setPeriod(newPeriod);
+    if (newPeriod === 'custom') {
+      setShowCustomDatePicker(true);
+      // Set default custom dates
+      const today = new Date();
+      const thirtyDaysAgo = subDays(today, 29);
+      setCustomStartDate(format(thirtyDaysAgo, 'yyyy-MM-dd'));
+      setCustomEndDate(format(today, 'yyyy-MM-dd'));
+    } else {
+      setShowCustomDatePicker(false);
+    }
+  };
+
+  const applyCustomDateRange = () => {
+    if (!customStartDate || !customEndDate) {
+      alert('Please select both start and end dates');
+      return;
+    }
+    if (new Date(customStartDate) > new Date(customEndDate)) {
+      alert('Start date must be before end date');
+      return;
+    }
+    loadAnalytics();
   };
 
   const getChartData = () => {
@@ -117,6 +154,39 @@ const Analytics = ({ user }) => {
         }
 
         currentDate.setMonth(currentDate.getMonth() + 1);
+      }
+    } else if (period === '3months') {
+      // Group by week for 3 months view
+      const weeklyData = {};
+      analyticsData.dailyData.forEach(day => {
+        const date = new Date(day.entry_date);
+        const weekStart = startOfWeek(date);
+        const weekKey = format(weekStart, 'yyyy-MM-dd');
+        if (!weeklyData[weekKey]) {
+          weeklyData[weekKey] = { total: 0, count: 0 };
+        }
+        weeklyData[weekKey].total += day.total_protein;
+        weeklyData[weekKey].count++;
+      });
+
+      // Generate all weeks in range
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      let currentDate = startOfWeek(start);
+
+      while (currentDate <= end) {
+        const weekKey = format(currentDate, 'yyyy-MM-dd');
+        const weekLabel = format(currentDate, 'MMM d');
+        labels.push(weekLabel);
+
+        if (weeklyData[weekKey]) {
+          const avgProtein = weeklyData[weekKey].total / weeklyData[weekKey].count;
+          proteinData.push(Math.round(avgProtein));
+        } else {
+          proteinData.push(0);
+        }
+
+        currentDate = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
       }
     } else {
       // Daily view for week and month
@@ -237,23 +307,67 @@ const Analytics = ({ user }) => {
       <div className="period-selector">
         <button
           className={`period-btn ${period === 'week' ? 'active' : ''}`}
-          onClick={() => setPeriod('week')}
+          onClick={() => handlePeriodChange('week')}
         >
-          Week
+          7 Days
         </button>
         <button
           className={`period-btn ${period === 'month' ? 'active' : ''}`}
-          onClick={() => setPeriod('month')}
+          onClick={() => handlePeriodChange('month')}
         >
-          Month
+          30 Days
+        </button>
+        <button
+          className={`period-btn ${period === '3months' ? 'active' : ''}`}
+          onClick={() => handlePeriodChange('3months')}
+        >
+          90 Days
         </button>
         <button
           className={`period-btn ${period === 'year' ? 'active' : ''}`}
-          onClick={() => setPeriod('year')}
+          onClick={() => handlePeriodChange('year')}
         >
           Year
         </button>
+        <button
+          className={`period-btn ${period === 'custom' ? 'active' : ''}`}
+          onClick={() => handlePeriodChange('custom')}
+        >
+          Custom
+        </button>
       </div>
+
+      {/* Custom Date Range Picker */}
+      {showCustomDatePicker && (
+        <div className="custom-date-range">
+          <div className="date-range-inputs">
+            <div className="date-range-input">
+              <label>Start Date:</label>
+              <input
+                type="date"
+                value={customStartDate}
+                onChange={(e) => setCustomStartDate(e.target.value)}
+                max={customEndDate || new Date().toISOString().split('T')[0]}
+                className="date-input"
+              />
+            </div>
+            <div className="date-range-input">
+              <label>End Date:</label>
+              <input
+                type="date"
+                value={customEndDate}
+                onChange={(e) => setCustomEndDate(e.target.value)}
+                min={customStartDate}
+                max={new Date().toISOString().split('T')[0]}
+                className="date-input"
+              />
+            </div>
+          </div>
+          <button className="btn btn-primary apply-date-btn" onClick={applyCustomDateRange}>
+            Apply Date Range
+          </button>
+        </div>
+      )}
 
       {/* Statistics Cards */}
       <div className="stats-grid">
@@ -299,7 +413,9 @@ const Analytics = ({ user }) => {
           <h3 className="chart-title">
             {period === 'week' && 'Last 7 Days'}
             {period === 'month' && 'Last 30 Days'}
+            {period === '3months' && 'Last 90 Days'}
             {period === 'year' && 'Last 12 Months (Avg)'}
+            {period === 'custom' && `Custom Range: ${customStartDate} to ${customEndDate}`}
           </h3>
         </div>
         <div className="chart-container">
