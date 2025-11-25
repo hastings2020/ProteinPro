@@ -8,6 +8,8 @@ import History from './components/History';
 import Calendar from './components/Calendar';
 import Analytics from './components/Analytics';
 import Settings from './components/Settings';
+import Feedback from './components/Feedback';
+import AdminFeedback from './components/AdminFeedback';
 import { fetchUser } from './services/api';
 
 function App() {
@@ -59,6 +61,8 @@ function App() {
             <Route path="/calendar" element={<Calendar user={user} />} />
             <Route path="/analytics" element={<Analytics user={user} />} />
             <Route path="/settings" element={<Settings user={user} updateUser={updateUserSettings} />} />
+            <Route path="/feedback" element={<Feedback />} />
+            <Route path="/admin/feedbacks" element={<AdminFeedback />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

@@ -399,6 +399,57 @@ app.get('/api/food/search', async (req, res) => {
   }
 });
 
+// ================== FEEDBACK ROUTES ==================
+
+// Get all feedbacks (admin only)
+app.get('/api/feedbacks', async (req, res) => {
+  try {
+    const feedbacks = await dbAll(
+      'SELECT * FROM feedbacks ORDER BY created_at DESC'
+    );
+    res.json(feedbacks);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Submit new feedback
+app.post('/api/feedbacks', upload.single('screenshot'), async (req, res) => {
+  try {
+    const { name, email, category, message } = req.body;
+    const screenshot = req.file ? req.file.filename : null;
+
+    // Validate required fields
+    if (!message) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    const result = await dbRun(
+      `INSERT INTO feedbacks (name, email, category, message, screenshot_path)
+       VALUES (?, ?, ?, ?, ?)`,
+      [name || 'Anonymous', email || null, category || 'general', message, screenshot]
+    );
+
+    const feedback = await dbGet('SELECT * FROM feedbacks WHERE id = ?', [result.id]);
+    res.status(201).json(feedback);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Delete feedback (admin only)
+app.delete('/api/feedbacks/:id', async (req, res) => {
+  try {
+    await dbRun('DELETE FROM feedbacks WHERE id = ?', [req.params.id]);
+    res.json({ message: 'Feedback deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // ================== EXPORT DATA ==================
 
 // Export all entries as CSV

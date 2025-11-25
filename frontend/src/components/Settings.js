@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FaSave, FaUser, FaBullseye, FaWeight, FaEnvelope, FaInfoCircle } from 'react-icons/fa';
+import { FaSave, FaUser, FaBullseye, FaWeight, FaEnvelope, FaInfoCircle, FaCommentDots } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 import './Settings.css';
 import { updateUser } from '../services/api';
 import Notification from './Notification';
@@ -192,6 +193,20 @@ const Settings = ({ user, updateUser: updateUserContext }) => {
               <small className="form-help">Click on a recommendation to apply it</small>
             </div>
           )}
+        </div>
+
+        {/* Feedback Section */}
+        <div className="card settings-card feedback-card">
+          <h2 className="settings-section-title">
+            <FaCommentDots /> Help Us Improve
+          </h2>
+          <p className="about-text">
+            Have suggestions or found a bug? We'd love to hear from you!
+            Your feedback helps us make ProteinPro better for everyone.
+          </p>
+          <Link to="/feedback" className="btn-feedback-link">
+            Submit Feedback
+          </Link>
         </div>
 
         {/* About Section */}

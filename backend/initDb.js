@@ -64,6 +64,19 @@ db.serialize(() => {
     )
   `);
 
+  // Create feedbacks table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS feedbacks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT DEFAULT 'Anonymous',
+      email TEXT,
+      category TEXT DEFAULT 'general',
+      message TEXT NOT NULL,
+      screenshot_path TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   // Insert default user
   db.run(`
     INSERT OR IGNORE INTO users (id, username, email, daily_protein_target, weight)

@@ -100,4 +100,33 @@ export const exportData = async (userId) => {
   return response.data;
 };
 
+// Feedback API
+export const submitFeedback = async (feedbackData) => {
+  const formData = new FormData();
+  formData.append('name', feedbackData.name || 'Anonymous');
+  formData.append('email', feedbackData.email || '');
+  formData.append('category', feedbackData.category || 'general');
+  formData.append('message', feedbackData.message);
+  if (feedbackData.screenshot) {
+    formData.append('screenshot', feedbackData.screenshot);
+  }
+
+  const response = await axios.post(`${API_BASE_URL}/feedbacks`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+
+export const fetchFeedbacks = async () => {
+  const response = await api.get('/feedbacks');
+  return response.data;
+};
+
+export const deleteFeedback = async (feedbackId) => {
+  const response = await api.delete(`/feedbacks/${feedbackId}`);
+  return response.data;
+};
+
 export default api;

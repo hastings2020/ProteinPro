@@ -95,6 +95,34 @@
   color: #999;
 }
 
+/* Feedback Section */
+.feedback-card {
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  color: white;
+}
+
+.feedback-card .settings-section-title {
+  color: white;
+  border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-feedback-link {
+  display: inline-block;
+  background: white;
+  color: #4caf50;
+  padding: 12px 24px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-feedback-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
 /* About Section */
 .about-card {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
