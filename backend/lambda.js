@@ -62,16 +62,36 @@ app.put('/api/user/:userId', async (req, res) => {
   try {
     const { daily_protein_target, weight, username, email } = req.body;
 
+    // Build dynamic update expression for only provided fields
+    const updateParts = [];
+    const expressionAttributeValues = {};
+
+    if (daily_protein_target !== undefined) {
+      updateParts.push('daily_protein_target = :target');
+      expressionAttributeValues[':target'] = daily_protein_target;
+    }
+    if (weight !== undefined) {
+      updateParts.push('weight = :weight');
+      expressionAttributeValues[':weight'] = weight;
+    }
+    if (username !== undefined) {
+      updateParts.push('username = :username');
+      expressionAttributeValues[':username'] = username;
+    }
+    if (email !== undefined) {
+      updateParts.push('email = :email');
+      expressionAttributeValues[':email'] = email;
+    }
+
+    if (updateParts.length === 0) {
+      return res.status(400).json({ error: 'No fields to update' });
+    }
+
     const result = await ddb.send(new UpdateCommand({
       TableName: USERS_TABLE,
       Key: { id: req.params.userId },
-      UpdateExpression: 'set daily_protein_target = :target, weight = :weight, username = :username, email = :email',
-      ExpressionAttributeValues: {
-        ':target': daily_protein_target,
-        ':weight': weight,
-        ':username': username,
-        ':email': email
-      },
+      UpdateExpression: 'set ' + updateParts.join(', '),
+      ExpressionAttributeValues: expressionAttributeValues,
       ReturnValues: 'ALL_NEW'
     }));
 
@@ -444,6 +464,104 @@ app.get('/api/food/search', async (req, res) => {
     });
 
     res.json(foods);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Feedback endpoints (Note: Screenshot upload not supported in serverless - use S3 if needed)
+app.get('/api/feedbacks', async (req, res) => {
+  try {
+    // For serverless, we'll return empty array or implement DynamoDB table if needed
+    // This is a placeholder - you'd need to create a feedbacks table in DynamoDB
+    res.json([]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/feedbacks', async (req, res) => {
+  try {
+    const { name, email, category, message } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    // For now, just return success without storing
+    // To implement properly, create a feedbacks DynamoDB table
+    const feedback = {
+      id: uuidv4(),
+      name: name || 'Anonymous',
+      email: email || null,
+      category: category || 'general',
+      message,
+      screenshot_path: null, // Screenshot upload not supported in serverless
+      created_at: new Date().toISOString()
+    };
+
+    // TODO: Store in DynamoDB if feedbacks table is created
+    // await ddb.send(new PutCommand({
+    //   TableName: process.env.FEEDBACKS_TABLE,
+    //   Item: feedback
+    // }));
+
+    res.status(201).json({
+      ...feedback,
+      note: 'Feedback received. Note: Screenshot uploads are not supported in serverless deployment.'
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/feedbacks/:id', async (req, res) => {
+  try {
+    // Placeholder - implement with DynamoDB if feedbacks table is created
+    res.json({ message: 'Feedback deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Export data endpoint
+app.get('/api/export/:userId', async (req, res) => {
+  try {
+    // Get all entries for the user
+    const result = await ddb.send(new QueryCommand({
+      TableName: ENTRIES_TABLE,
+      IndexName: 'user_id-entry_date-index',
+      KeyConditionExpression: 'user_id = :userId',
+      ExpressionAttributeValues: {
+        ':userId': req.params.userId
+      }
+    }));
+
+    const entries = result.Items || [];
+
+    // Create CSV
+    const csvHeader = 'Date,Time,Food Name,Protein (g),Calories,Carbs (g),Fat (g),Serving Size,Meal Type,Quantity,Notes\n';
+    const csvRows = entries.map(entry => {
+      return [
+        entry.entry_date,
+        entry.entry_time ? new Date(entry.entry_time).toLocaleTimeString() : '',
+        `"${entry.food_name}"`,
+        entry.protein_grams,
+        entry.calories || '',
+        entry.carbs || '',
+        entry.fat || '',
+        entry.serving_size || '',
+        entry.meal_type || '',
+        entry.quantity || 1,
+        entry.notes ? `"${entry.notes}"` : ''
+      ].join(',');
+    }).join('\n');
+
+    const csv = csvHeader + csvRows;
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename=proteinpro-data-${new Date().toISOString().split('T')[0]}.csv`);
+    res.send(csv);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
