@@ -19,6 +19,7 @@ const Home = ({ user }) => {
   const [copyFromDate, setCopyFromDate] = useState('');
   const [copyFromEntries, setCopyFromEntries] = useState([]);
   const [selectedCopyFromEntries, setSelectedCopyFromEntries] = useState([]);
+  const [editingQuantity, setEditingQuantity] = useState(null);
 
   useEffect(() => {
     if (user && user.id) {
@@ -281,20 +282,6 @@ const Home = ({ user }) => {
     <div className="page home-page">
       <h1 className="page-title">Daily Protein Tracker</h1>
 
-      {/* Date Selector */}
-      <div className="date-selector">
-        <FaCalendar />
-        <input
-          type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-          max={new Date().toISOString().split('T')[0]}
-          className="date-input"
-        />
-        <span className="date-label">
-          {selectedDate === new Date().toISOString().split('T')[0] ? 'Today' : selectedDate}
-        </span>
-      </div>
 
       {/* Progress Circle with Goal Status */}
       <div className="progress-card">
@@ -322,9 +309,9 @@ const Home = ({ user }) => {
             />
           </svg>
           <div className="progress-text">
+            <div className="progress-percentage">{Math.round(progressPercentage)}%</div>
             <div className="progress-amount">{Math.round(totalProtein)}g</div>
             <div className="progress-target">of {target}g</div>
-            <div className="progress-percentage">{Math.round(progressPercentage)}%</div>
           </div>
         </div>
 
@@ -346,17 +333,41 @@ const Home = ({ user }) => {
         </div>
       </div>
 
-      {/* Quick Add Buttons */}
-      <div className="add-buttons">
-        <button className="btn btn-success btn-quick-add" onClick={() => setShowQuickAdd(true)}>
-          <FaBolt /> Quick Add
-        </button>
-        <button className="btn btn-primary btn-add-food" onClick={openAddModal}>
-          <FaPlus /> Full Entry
-        </button>
-        <button className="btn btn-secondary btn-copy-from" onClick={handleOpenCopyFrom}>
-          <FaCopy /> Copy From...
-        </button>
+      {/* 4-Pane Action Grid */}
+      <div className="action-grid">
+        <div className="action-pane" onClick={() => setShowQuickAdd(true)}>
+          <div className="action-icon">
+            <FaBolt />
+          </div>
+          <span className="action-label">Quick Add</span>
+        </div>
+        <div className="action-pane" onClick={openAddModal}>
+          <div className="action-icon">
+            <FaPlus />
+          </div>
+          <span className="action-label">Full Entry</span>
+        </div>
+        <div className="action-pane" onClick={handleOpenCopyFrom}>
+          <div className="action-icon">
+            <FaCopy />
+          </div>
+          <span className="action-label">Repeat</span>
+        </div>
+        <div className="action-pane calendar-pane">
+          <div className="action-icon">
+            <FaCalendar />
+          </div>
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            max={new Date().toISOString().split('T')[0]}
+            className="calendar-date-input"
+          />
+          <span className="action-label calendar-label">
+            {selectedDate === new Date().toISOString().split('T')[0] ? 'Today' : new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+          </span>
+        </div>
       </div>
 
       {/* Today's Entries - Compact View */}
@@ -396,7 +407,37 @@ const Home = ({ user }) => {
                     >
                       -
                     </button>
-                    <span className="qty-display">x {entry.quantity || 1}</span>
+                    {editingQuantity === entry.id ? (
+                      <input
+                        type="number"
+                        min="1"
+                        value={entry.quantity || 1}
+                        onChange={(e) => {
+                          const newQty = parseInt(e.target.value) || 1;
+                          if (newQty >= 1) {
+                            handleUpdateQuantity(entry, newQty);
+                          }
+                        }}
+                        onBlur={() => setEditingQuantity(null)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            setEditingQuantity(null);
+                          }
+                        }}
+                        className="qty-input"
+                        autoFocus
+                      />
+                    ) : (
+                      <span
+                        className="qty-display"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingQuantity(entry.id);
+                        }}
+                      >
+                        x {entry.quantity || 1}
+                      </span>
+                    )}
                     <button
                       className="qty-btn"
                       onClick={() => handleUpdateQuantity(entry, (entry.quantity || 1) + 1)}
@@ -491,12 +532,12 @@ const Home = ({ user }) => {
         />
       )}
 
-      {/* Copy From Modal */}
+      {/* Repeat From Modal */}
       {showCopyFromModal && (
         <div className="modal-overlay" onClick={() => setShowCopyFromModal(false)}>
           <div className="modal copy-from-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Copy Entries From...</h2>
+              <h2>Repeat Entries From...</h2>
               <button className="modal-close" onClick={() => setShowCopyFromModal(false)}>×</button>
             </div>
             <div className="modal-body">

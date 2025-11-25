@@ -2,41 +2,79 @@
   padding-bottom: 20px;
 }
 
-/* Date Selector */
-.date-selector {
+/* 4-Pane Action Grid */
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.action-pane {
+  position: relative;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  min-height: 100px;
+}
+
+.action-pane:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.action-pane:active {
+  transform: translateY(-2px);
+}
+
+.action-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: #f5f5f5;
-  padding: 12px 16px;
-  border-radius: 12px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  backdrop-filter: blur(10px);
 }
 
-.date-selector svg {
-  color: #667eea;
-  font-size: 18px;
-}
-
-.date-input {
-  border: 1px solid #ddd;
-  padding: 8px 12px;
-  border-radius: 8px;
+.action-label {
+  color: white;
+  font-weight: 600;
   font-size: 14px;
-  background: white;
+  text-align: center;
+}
+
+/* Modern Calendar Pane */
+.calendar-pane {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.calendar-date-input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
   cursor: pointer;
-  transition: all 0.2s;
+  z-index: 10;
 }
 
-.date-input:hover {
-  border-color: #667eea;
-}
-
-.date-label {
-  font-weight: 500;
-  color: #333;
-  flex: 1;
+.calendar-label {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 /* Protein Progress Card */
@@ -114,6 +152,14 @@
   text-align: center;
 }
 
+.progress-percentage {
+  font-size: 20px;
+  font-weight: 700;
+  opacity: 1;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
 .progress-amount {
   font-size: 48px;
   font-weight: 700;
@@ -124,13 +170,6 @@
 .progress-target {
   font-size: 14px;
   opacity: 0.9;
-  margin-bottom: 8px;
-}
-
-.progress-percentage {
-  font-size: 16px;
-  font-weight: 600;
-  opacity: 0.8;
 }
 
 .progress-stats {
@@ -148,8 +187,11 @@
 
 .stat-label {
   font-size: 12px;
-  opacity: 0.8;
+  font-weight: 600;
+  opacity: 1;
   margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .stat-value {
@@ -157,20 +199,6 @@
   font-weight: 700;
 }
 
-/* Add Food Buttons */
-.add-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.btn-quick-add,
-.btn-add-food {
-  font-size: 16px;
-  padding: 16px 12px;
-  white-space: nowrap;
-}
 
 /* Entries Hint */
 .entries-hint {
@@ -301,6 +329,32 @@
   font-weight: 600;
   font-size: 13px;
   color: #333;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.qty-display:hover {
+  background: #f0f0f0;
+}
+
+.qty-input {
+  width: 50px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 13px;
+  color: #333;
+  border: 2px solid #667eea;
+  border-radius: 6px;
+  padding: 4px;
+  background: white;
+  outline: none;
+}
+
+.qty-input:focus {
+  border-color: #764ba2;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .entry-right {
@@ -715,14 +769,19 @@
     font-size: 20px;
   }
 
-  .btn-quick-add,
-  .btn-add-food {
-    font-size: 14px;
-    padding: 14px 10px;
+  .action-pane {
+    padding: 16px;
+    min-height: 90px;
   }
 
-  .date-selector {
-    flex-wrap: wrap;
+  .action-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .action-label {
+    font-size: 13px;
   }
 
   .goal-status-banner {
