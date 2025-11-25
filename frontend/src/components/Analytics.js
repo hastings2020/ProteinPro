@@ -42,7 +42,7 @@ const Analytics = ({ user }) => {
     try {
       setLoading(true);
       const { startDate, endDate } = getDateRange(period);
-      const data = await fetchAnalytics(user.id, period, startDate, endDate);
+      const data = await fetchAnalytics(user.id, startDate, endDate);
       setAnalyticsData(data);
     } catch (error) {
       console.error('Error loading analytics:', error);
