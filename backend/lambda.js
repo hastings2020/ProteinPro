@@ -153,23 +153,20 @@ app.get('/api/entries/:userId/daily-totals', async (req, res) => {
       }
     }));
 
-    // Group by date
+    // Group by date and multiply by quantity
     const dailyTotals = {};
     (result.Items || []).forEach(entry => {
       if (!dailyTotals[entry.entry_date]) {
         dailyTotals[entry.entry_date] = {
-          date: entry.entry_date,
+          entry_date: entry.entry_date,
           total_protein: 0,
           total_calories: 0,
-          total_carbs: 0,
-          total_fat: 0,
           entry_count: 0
         };
       }
-      dailyTotals[entry.entry_date].total_protein += parseFloat(entry.protein_grams) || 0;
-      dailyTotals[entry.entry_date].total_calories += parseFloat(entry.calories) || 0;
-      dailyTotals[entry.entry_date].total_carbs += parseFloat(entry.carbs) || 0;
-      dailyTotals[entry.entry_date].total_fat += parseFloat(entry.fat) || 0;
+      const quantity = parseInt(entry.quantity) || 1;
+      dailyTotals[entry.entry_date].total_protein += (parseFloat(entry.protein_grams) || 0) * quantity;
+      dailyTotals[entry.entry_date].total_calories += (parseFloat(entry.calories) || 0) * quantity;
       dailyTotals[entry.entry_date].entry_count += 1;
     });
 
@@ -286,6 +283,7 @@ app.get('/api/analytics/:userId', async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
 
+    // Get all entries in the date range
     const result = await ddb.send(new QueryCommand({
       TableName: ENTRIES_TABLE,
       IndexName: 'user_id-entry_date-index',
@@ -298,16 +296,60 @@ app.get('/api/analytics/:userId', async (req, res) => {
     }));
 
     const entries = result.Items || [];
-    const totalProtein = entries.reduce((sum, e) => sum + (parseFloat(e.protein_grams) || 0), 0);
-    const totalCalories = entries.reduce((sum, e) => sum + (parseFloat(e.calories) || 0), 0);
-    const avgProtein = entries.length > 0 ? totalProtein / entries.length : 0;
+
+    // Group entries by date to create daily data
+    const dailyMap = {};
+    entries.forEach(entry => {
+      if (!dailyMap[entry.entry_date]) {
+        dailyMap[entry.entry_date] = {
+          entry_date: entry.entry_date,
+          total_protein: 0,
+          total_calories: 0,
+          entry_count: 0
+        };
+      }
+      const quantity = parseInt(entry.quantity) || 1;
+      dailyMap[entry.entry_date].total_protein += (parseFloat(entry.protein_grams) || 0) * quantity;
+      dailyMap[entry.entry_date].total_calories += (parseFloat(entry.calories) || 0) * quantity;
+      dailyMap[entry.entry_date].entry_count += 1;
+    });
+
+    const dailyData = Object.values(dailyMap).sort((a, b) => a.entry_date.localeCompare(b.entry_date));
+
+    // Get user's target
+    const userResult = await ddb.send(new GetCommand({
+      TableName: USERS_TABLE,
+      Key: { id: req.params.userId }
+    }));
+    const user = userResult.Item || { daily_protein_target: 150 };
+
+    // Calculate statistics
+    const totalDays = dailyData.length;
+    const totalProtein = dailyData.reduce((sum, day) => sum + day.total_protein, 0);
+    const avgProtein = totalDays > 0 ? totalProtein / totalDays : 0;
+    const daysMetGoal = dailyData.filter(day => day.total_protein >= user.daily_protein_target).length;
+
+    // Calculate streak (days in a row meeting goal, from most recent backwards)
+    let currentStreak = 0;
+    const sortedDays = [...dailyData].reverse();
+    for (let day of sortedDays) {
+      if (day.total_protein >= user.daily_protein_target) {
+        currentStreak++;
+      } else {
+        break;
+      }
+    }
 
     res.json({
-      total_entries: entries.length,
-      total_protein: totalProtein,
-      total_calories: totalCalories,
-      avg_protein_per_entry: avgProtein,
-      entries
+      dailyData,
+      statistics: {
+        totalDays,
+        avgProtein: Math.round(avgProtein * 10) / 10,
+        daysMetGoal,
+        goalPercentage: totalDays > 0 ? Math.round((daysMetGoal / totalDays) * 100) : 0,
+        currentStreak,
+        target: user.daily_protein_target
+      }
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
