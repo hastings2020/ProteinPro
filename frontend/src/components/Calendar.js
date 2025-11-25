@@ -26,11 +26,14 @@ const Calendar = ({ user }) => {
       const start = format(startOfMonth(date), 'yyyy-MM-dd');
       const end = format(endOfMonth(date), 'yyyy-MM-dd');
 
+      console.log('Calendar: Fetching data for month:', { start, end });
       const data = await fetchDailyTotals(user.id, start, end);
+      console.log('Calendar: Received data:', data);
 
       // Convert array to object with dates as keys
       const totalsMap = {};
       data.forEach(day => {
+        console.log('Calendar: Processing day:', day.entry_date, 'protein:', day.total_protein);
         totalsMap[day.entry_date] = {
           protein: day.total_protein,
           calories: day.total_calories,
@@ -38,6 +41,7 @@ const Calendar = ({ user }) => {
         };
       });
 
+      console.log('Calendar: Final totalsMap:', totalsMap);
       setDailyTotals(totalsMap);
     } catch (error) {
       console.error('Error loading month data:', error);
@@ -78,6 +82,11 @@ const Calendar = ({ user }) => {
 
     const dateStr = format(date, 'yyyy-MM-dd');
     const dayData = dailyTotals[dateStr];
+
+    // Debug logging for Nov 18 and 23
+    if (dateStr.includes('-11-18') || dateStr.includes('-11-23')) {
+      console.log('Calendar tile:', dateStr, 'dayData:', dayData, 'all totals:', Object.keys(dailyTotals));
+    }
 
     if (!dayData) return null;
 

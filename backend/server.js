@@ -109,6 +109,14 @@ app.get('/api/entries/:userId', async (req, res) => {
       'SELECT * FROM food_entries WHERE user_id = ? ORDER BY entry_date DESC, entry_time DESC',
       [req.params.userId]
     );
+    console.log('API: Fetching all entries for user:', req.params.userId);
+    console.log('API: Total entries found:', entries.length);
+    if (entries.length > 0) {
+      console.log('API: Date range:', entries[entries.length - 1].entry_date, 'to', entries[0].entry_date);
+      // Log unique dates
+      const uniqueDates = [...new Set(entries.map(e => e.entry_date))];
+      console.log('API: Unique dates with entries:', uniqueDates);
+    }
     res.json(entries);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -146,20 +154,29 @@ app.get('/api/entries/:userId/range', async (req, res) => {
 app.get('/api/entries/:userId/daily-totals', async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
+    console.log('API: Fetching daily totals for user:', req.params.userId, 'from', startDate, 'to', endDate);
+
+    // First, let's see all entries for this user to debug
+    const allEntries = await dbAll('SELECT DISTINCT DATE(entry_date) as entry_date FROM food_entries WHERE user_id = ? ORDER BY entry_date DESC', [req.params.userId]);
+    console.log('API: All unique entry dates for user:', allEntries.map(e => e.entry_date));
+
     const query = `
       SELECT
-        entry_date,
+        DATE(entry_date) as entry_date,
         SUM(protein_grams) as total_protein,
         SUM(calories) as total_calories,
         COUNT(*) as entry_count
       FROM food_entries
-      WHERE user_id = ? AND entry_date BETWEEN ? AND ?
-      GROUP BY entry_date
+      WHERE user_id = ? AND DATE(entry_date) >= DATE(?) AND DATE(entry_date) <= DATE(?)
+      GROUP BY DATE(entry_date)
       ORDER BY entry_date DESC
     `;
     const dailyTotals = await dbAll(query, [req.params.userId, startDate, endDate]);
+    console.log('API: Found', dailyTotals.length, 'days with data');
+    console.log('API: Daily totals:', JSON.stringify(dailyTotals, null, 2));
     res.json(dailyTotals);
   } catch (error) {
+    console.error('API Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
