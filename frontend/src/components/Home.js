@@ -302,28 +302,30 @@ const Home = ({ user }) => {
           <span className="goal-text">{goalStatus.text}</span>
         </div>
 
-        <div className="progress-circle">
-          <svg width="200" height="200" viewBox="0 0 200 200">
-            <circle
-              className="progress-circle-bg"
-              cx="100"
-              cy="100"
-              r="85"
-            />
-            <circle
-              className="progress-circle-fill"
-              cx="100"
-              cy="100"
-              r="85"
-              strokeDasharray={`${progressPercentage * 5.34} 534`}
-              strokeDashoffset="0"
-              style={{ stroke: goalStatus.color }}
-            />
-          </svg>
-          <div className="progress-text">
-            <div className="progress-percentage">{Math.round(progressPercentage)}%</div>
-            <div className="progress-amount">{Math.round(totalProtein)}g</div>
-            <div className="progress-target">of {target}g</div>
+        <div className="progress-circle-container">
+          <div className="progress-circle">
+            <svg width="200" height="200" viewBox="0 0 200 200">
+              <circle
+                className="progress-circle-bg"
+                cx="100"
+                cy="100"
+                r="85"
+              />
+              <circle
+                className="progress-circle-fill"
+                cx="100"
+                cy="100"
+                r="85"
+                strokeDasharray={`${progressPercentage * 5.34} 534`}
+                strokeDashoffset="0"
+                style={{ stroke: goalStatus.color }}
+              />
+            </svg>
+            <div className="progress-text">
+              <div className="progress-percentage">{Math.round(progressPercentage)}%</div>
+              <div className="progress-amount">{Math.round(totalProtein)}g</div>
+              <div className="progress-target">of {target}g</div>
+            </div>
           </div>
         </div>
 
