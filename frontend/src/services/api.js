@@ -102,21 +102,34 @@ export const exportData = async (userId) => {
 
 // Feedback API
 export const submitFeedback = async (feedbackData) => {
-  const formData = new FormData();
-  formData.append('name', feedbackData.name || 'Anonymous');
-  formData.append('email', feedbackData.email || '');
-  formData.append('category', feedbackData.category || 'general');
-  formData.append('message', feedbackData.message);
-  if (feedbackData.screenshot) {
-    formData.append('screenshot', feedbackData.screenshot);
-  }
+  // Check if running against local server (with file upload support) or serverless (JSON only)
+  const isLocalServer = API_BASE_URL.includes('localhost') || API_BASE_URL.includes('127.0.0.1');
 
-  const response = await axios.post(`${API_BASE_URL}/feedbacks`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-  return response.data;
+  if (isLocalServer && feedbackData.screenshot) {
+    // Use FormData for local server with file upload
+    const formData = new FormData();
+    formData.append('name', feedbackData.name || 'Anonymous');
+    formData.append('email', feedbackData.email || '');
+    formData.append('category', feedbackData.category || 'general');
+    formData.append('message', feedbackData.message || '');
+    formData.append('screenshot', feedbackData.screenshot);
+
+    const response = await axios.post(`${API_BASE_URL}/feedbacks`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } else {
+    // Use JSON for serverless deployment (no file upload support)
+    const response = await api.post('/feedbacks', {
+      name: feedbackData.name || 'Anonymous',
+      email: feedbackData.email || '',
+      category: feedbackData.category || 'general',
+      message: feedbackData.message || ''
+    });
+    return response.data;
+  }
 };
 
 export const fetchFeedbacks = async () => {
