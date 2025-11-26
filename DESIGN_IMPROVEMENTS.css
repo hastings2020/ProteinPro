@@ -1,4 +1,27 @@
 /* COMPREHENSIVE DESIGN IMPROVEMENTS - Home.css */
+
+/* ==========================================================================
+   DESIGN IMPROVEMENTS SUMMARY
+   ========================================================================== */
+
+/*
+BEFORE:
+- Poor text contrast on gradient backgrounds
+- Cluttered action buttons
+- Disconnected goal banner
+- Tiny bottom stats that are hard to read
+- Vertical text bug in food entries
+
+AFTER:
+- Improved contrast with semi-transparent overlays
+- Streamlined 3-button layout
+- Integrated motivational messages
+- Larger, more readable stats with icons
+- Fixed text orientation bug
+- Added smooth animations
+- Better visual hierarchy
+========================================================================== */
+
 .home-page {
   padding-bottom: 20px;
   animation: fadeIn 0.3s ease-in;
@@ -150,91 +173,6 @@
   font-size: 14px;
   text-align: center;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-/* Modern Calendar Pane (legacy support) */
-.calendar-pane {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 12px;
-  gap: 8px;
-}
-
-.calendar-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  flex: 1;
-  position: relative;
-  pointer-events: none;
-}
-
-.date-nav-btn {
-  background: rgba(255, 255, 255, 0.3);
-  border: none;
-  color: white;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 14px;
-  flex-shrink: 0;
-  backdrop-filter: blur(10px);
-}
-
-.date-nav-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.5);
-  transform: scale(1.1);
-}
-
-.date-nav-btn:active:not(:disabled) {
-  transform: scale(0.95);
-}
-
-.date-nav-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-.calendar-date-input {
-  position: absolute;
-  opacity: 0;
-  width: 100%;
-  height: 40px;
-  bottom: 0;
-  left: 0;
-  cursor: pointer;
-  z-index: 10;
-  pointer-events: auto;
-}
-
-.calendar-date-input::-webkit-calendar-picker-indicator {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  cursor: pointer;
-}
-
-.calendar-label {
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  pointer-events: none;
-  color: white;
 }
 
 /* ==========================================================================
@@ -471,24 +409,6 @@
   line-height: 1;
 }
 
-/* Entries Hint */
-.entries-hint {
-  background: #e8f5e9;
-  border-left: 3px solid #4caf50;
-  padding: 10px 12px;
-  margin-bottom: 12px;
-  border-radius: 6px;
-  font-size: 13px;
-  color: #2e7d32;
-  display: flex;
-  align-items: center;
-}
-
-.entries-hint strong {
-  color: #1b5e20;
-  margin: 0 3px;
-}
-
 /* ==========================================================================
    FOOD ENTRY CARDS - Fixed vertical text bug, better layout
    ========================================================================== */
@@ -629,24 +549,6 @@
   background: rgba(102, 126, 234, 0.1);
 }
 
-.qty-input {
-  width: 50px;
-  text-align: center;
-  font-weight: 600;
-  font-size: 13px;
-  color: #333;
-  border: 2px solid #667eea;
-  border-radius: 6px;
-  padding: 4px;
-  background: white;
-  outline: none;
-}
-
-.qty-input:focus {
-  border-color: #764ba2;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
 .entry-right {
   display: flex;
   flex-direction: column;
@@ -699,154 +601,133 @@
   box-shadow: 0 4px 8px rgba(244, 67, 54, 0.2);
 }
 
-/* Copy Menu */
-.copy-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 4px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 100;
-  min-width: 200px;
-  overflow: hidden;
-  animation: slideDown 0.2s ease;
-}
+/* ==========================================================================
+   RESPONSIVE DESIGN - Mobile optimizations
+   ========================================================================== */
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
+@media (max-width: 640px) {
+  .date-navigation-header {
+    padding: 10px 16px;
+    margin: -20px -20px 16px -20px;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .current-date-display {
+    font-size: 14px;
+    min-width: 160px;
+    padding: 6px 12px;
+  }
+
+  .date-nav-button {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  .action-grid {
+    gap: 10px;
+  }
+
+  .action-pane {
+    padding: 16px 12px;
+    min-height: 95px;
+  }
+
+  .action-icon {
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+  }
+
+  .action-label {
+    font-size: 13px;
+  }
+
+  .progress-circle-container {
+    width: 200px;
+    height: 200px;
+  }
+
+  .progress-amount {
+    font-size: 48px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .entry-name-compact {
+    font-size: 14px;
+  }
+
+  .protein-compact {
+    font-size: 18px;
+  }
+
+  /* Mobile layout for entries */
+  .entry-item-compact {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .entry-left {
+    flex-basis: 100%;
+    order: 1;
+  }
+
+  .entry-middle {
+    order: 2;
+  }
+
+  .entry-right {
+    order: 3;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .entry-actions-inline {
+    flex-basis: 100%;
+    order: 4;
+    justify-content: flex-end;
   }
 }
 
-.copy-menu-header {
-  padding: 10px 12px;
-  font-weight: 600;
-  font-size: 12px;
-  color: #666;
-  background: #f5f5f5;
-  text-transform: uppercase;
-}
+@media (max-width: 480px) {
+  .progress-circle-container {
+    width: 180px;
+    height: 180px;
+  }
 
-.copy-option {
-  display: block;
-  width: 100%;
-  padding: 12px 14px;
-  border: none;
-  background: white;
-  text-align: left;
-  cursor: pointer;
-  font-size: 13px;
-  color: #333;
-  transition: background 0.2s;
-  border-bottom: 1px solid #f0f0f0;
-}
+  .progress-amount {
+    font-size: 42px;
+  }
 
-.copy-option:hover {
-  background: #f9f9f9;
-}
+  .stat-value {
+    font-size: 22px;
+  }
 
-.copy-option.copy-cancel {
-  color: #f44336;
-  font-weight: 500;
-  border-bottom: none;
-}
+  .action-pane {
+    padding: 14px 10px;
+    min-height: 85px;
+  }
 
-.copy-option.copy-cancel:hover {
-  background: #ffebee;
-}
+  .action-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 18px;
+  }
 
-/* Old Entry Styles (fallback) */
-.entry-item {
-  padding: 16px;
-  background: #f9f9f9;
-  border-radius: 8px;
-  border-left: 4px solid #667eea;
-}
+  .action-label {
+    font-size: 12px;
+  }
 
-.entry-main {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
+  .goal-status-banner {
+    font-size: 15px;
+    padding: 12px 16px;
+  }
 
-.entry-info {
-  flex: 1;
-}
-
-.entry-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 6px;
-}
-
-.entry-details {
-  display: flex;
-  gap: 12px;
-  font-size: 13px;
-  color: #666;
-  flex-wrap: wrap;
-}
-
-.meal-badge {
-  background: #e0e0e0;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 11px;
-  text-transform: capitalize;
-}
-
-.entry-protein {
-  text-align: right;
-  margin-left: 16px;
-}
-
-.protein-amount {
-  font-size: 24px;
-  font-weight: 700;
-  color: #667eea;
-  line-height: 1;
-}
-
-.protein-label {
-  font-size: 11px;
-  color: #999;
-  text-transform: uppercase;
-}
-
-.entry-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-.btn-icon {
-  background: none;
-  border: none;
-  padding: 8px;
-  cursor: pointer;
-  color: #666;
-  font-size: 16px;
-  border-radius: 4px;
-  transition: all 0.2s;
-}
-
-.btn-icon:hover {
-  background: #e0e0e0;
-  color: #333;
-}
-
-.btn-icon-danger:hover {
-  background: #ffebee;
-  color: #f44336;
+  .goal-emoji {
+    font-size: 24px;
+  }
 }
 
 /* ==========================================================================
@@ -903,339 +784,4 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
-}
-
-/* Copy From Modal */
-.copy-from-modal {
-  max-width: 600px;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.copy-from-modal .modal-body {
-  overflow-y: auto;
-  flex: 1;
-}
-
-.copy-from-date-selector {
-  margin-bottom: 20px;
-  padding: 20px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.copy-from-date-selector label {
-  font-weight: 600;
-  color: #333;
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.copy-from-date-selector .date-input {
-  padding: 12px 16px;
-  border: 2px solid #667eea;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 500;
-  background: white;
-  color: #333;
-  cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.copy-from-date-selector .date-input:hover {
-  border-color: #764ba2;
-  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
-}
-
-.copy-from-date-selector .date-input:focus {
-  outline: none;
-  border-color: #764ba2;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.copy-from-entries {
-  margin-top: 16px;
-}
-
-.copy-from-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid #e0e0e0;
-}
-
-.copy-from-header h3 {
-  margin: 0;
-  font-size: 16px;
-  color: #333;
-}
-
-.copy-from-entry {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  margin-bottom: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.copy-from-entry:hover {
-  border-color: #667eea;
-  background: #f5f5f5;
-}
-
-.copy-from-entry.selected {
-  border-color: #667eea;
-  background: rgba(102, 126, 234, 0.1);
-}
-
-.copy-from-checkbox {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  accent-color: #667eea;
-}
-
-.copy-from-entry-details {
-  flex: 1;
-}
-
-.copy-from-entry-name {
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 4px;
-}
-
-.copy-from-entry-meta {
-  display: flex;
-  gap: 8px;
-  font-size: 12px;
-  color: #666;
-  flex-wrap: wrap;
-}
-
-.copy-from-entry-meta span {
-  background: #e0e0e0;
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
-.copy-from-entry-protein {
-  font-size: 18px;
-  font-weight: 700;
-  color: #667eea;
-}
-
-.copy-from-summary {
-  margin-top: 16px;
-  padding: 12px;
-  background: #e8f0fe;
-  border-radius: 8px;
-  text-align: center;
-  color: #1967d2;
-  font-size: 14px;
-}
-
-.btn-link {
-  background: none;
-  border: none;
-  color: #667eea;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 4px 8px;
-  text-decoration: underline;
-}
-
-.btn-link:hover {
-  color: #764ba2;
-}
-
-.btn-copy-from {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-  color: white;
-  padding: 14px 20px;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-}
-
-.btn-copy-from:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
-}
-
-/* ==========================================================================
-   RESPONSIVE DESIGN - Mobile optimizations
-   ========================================================================== */
-
-@media (max-width: 640px) {
-  .date-navigation-header {
-    padding: 10px 16px;
-    margin: -20px -20px 16px -20px;
-  }
-
-  .current-date-display {
-    font-size: 14px;
-    min-width: 160px;
-    padding: 6px 12px;
-  }
-
-  .date-nav-button {
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
-  }
-
-  .action-grid {
-    grid-template-columns: repeat(3, 1fr); /* Keep 3 columns on mobile */
-    gap: 10px;
-  }
-
-  .action-pane {
-    padding: 16px 12px;
-    min-height: 95px;
-  }
-
-  .action-icon {
-    width: 42px;
-    height: 42px;
-    font-size: 20px;
-  }
-
-  .action-label {
-    font-size: 13px;
-  }
-
-  .progress-circle-container {
-    width: 200px;
-    height: 200px;
-  }
-
-  .progress-amount {
-    font-size: 48px;
-  }
-
-  .stat-value {
-    font-size: 24px;
-  }
-
-  /* Allow food names to wrap instead of truncating */
-  .entry-name-compact {
-    font-size: 14px;
-    white-space: normal !important;
-    overflow: visible;
-    text-overflow: clip;
-    line-height: 1.3;
-    word-break: break-word;
-  }
-
-  .protein-compact {
-    font-size: 18px;
-  }
-
-  /* Mobile layout for entries */
-  .entry-item-compact {
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .entry-left {
-    flex-basis: 100%;
-    order: 1;
-  }
-
-  .entry-middle {
-    order: 2;
-  }
-
-  .entry-right {
-    order: 3;
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .entry-actions-inline {
-    flex-basis: 100%;
-    order: 4;
-    justify-content: flex-end;
-  }
-
-  .btn-icon-tiny {
-    padding: 8px;
-    font-size: 14px;
-  }
-
-  .copy-menu {
-    right: auto;
-    left: 0;
-  }
-}
-
-@media (max-width: 480px) {
-  .progress-circle-container {
-    width: 180px;
-    height: 180px;
-  }
-
-  .progress-amount {
-    font-size: 42px;
-  }
-
-  .stat-value {
-    font-size: 22px;
-  }
-
-  .action-pane {
-    padding: 14px 10px;
-    min-height: 85px;
-  }
-
-  .action-icon {
-    width: 38px;
-    height: 38px;
-    font-size: 18px;
-  }
-
-  .action-label {
-    font-size: 12px;
-  }
-
-  .goal-status-banner {
-    font-size: 15px;
-    padding: 12px 16px;
-  }
-
-  .goal-emoji {
-    font-size: 24px;
-  }
-
-  .entry-name-compact {
-    font-size: 14px;
-    white-space: normal !important;
-    overflow: visible;
-  }
-
-  .protein-compact {
-    font-size: 16px;
-  }
 }

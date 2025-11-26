@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaEdit, FaTrash, FaBolt, FaCopy, FaCalendar, FaStar, FaRegStar, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaBolt, FaCopy, FaStar, FaChevronLeft, FaChevronRight, FaFire, FaUtensils, FaBullseye } from 'react-icons/fa';
 import './Home.css';
 import { fetchEntriesByDate, addEntry, deleteEntry, updateEntry, addFavorite } from '../services/api';
 import AddEntryModal from './AddEntryModal';
@@ -294,21 +294,90 @@ const Home = ({ user }) => {
   const remaining = target - totalProtein;
   const progressPercentage = Math.min((totalProtein / target) * 100, 100);
 
-  // Goal status indicator
+  // Enhanced goal status with dynamic motivational messages
   const getGoalStatus = () => {
     const percentage = (totalProtein / target) * 100;
-    if (percentage >= 100) return { emoji: '🎉', color: '#4caf50', text: 'Goal Achieved!' };
-    if (percentage >= 80) return { emoji: '💪', color: '#ff9800', text: 'Almost There!' };
-    if (percentage >= 50) return { emoji: '👍', color: '#2196f3', text: 'Making Progress!' };
-    return { emoji: '🚀', color: '#9e9e9e', text: 'Keep Going!' };
+
+    // Goal reached and exceeded
+    if (percentage >= 120) return { emoji: '🏆', color: '#4caf50', text: 'Crushing It! Way Over Goal!' };
+    if (percentage >= 110) return { emoji: '🌟', color: '#4caf50', text: 'Superstar! Exceeded Goal!' };
+    if (percentage >= 100) return { emoji: '🎉', color: '#4caf50', text: 'Perfect! Goal Achieved!' };
+
+    // Close to goal
+    if (percentage >= 90) return { emoji: '💪', color: '#ff9800', text: 'So Close! Almost There!' };
+    if (percentage >= 80) return { emoji: '🔥', color: '#ff9800', text: 'Great Work! Keep It Up!' };
+    if (percentage >= 70) return { emoji: '👏', color: '#ff9800', text: 'Nice Progress! Nearly There!' };
+
+    // Mid-way progress
+    if (percentage >= 60) return { emoji: '💯', color: '#2196f3', text: 'Over Halfway! Doing Great!' };
+    if (percentage >= 50) return { emoji: '👍', color: '#2196f3', text: 'Halfway There! Keep Going!' };
+    if (percentage >= 40) return { emoji: '📈', color: '#2196f3', text: 'Making Progress!' };
+
+    // Getting started
+    if (percentage >= 25) return { emoji: '🚀', color: '#9e9e9e', text: 'Good Start! Keep It Up!' };
+    if (percentage >= 10) return { emoji: '✨', color: '#9e9e9e', text: 'Great Beginning!' };
+
+    // Just started or no progress
+    return { emoji: '💪', color: '#9e9e9e', text: "Let's Get Started!" };
   };
 
   const goalStatus = getGoalStatus();
 
+  // Format date for display
+  const formatDateDisplay = (dateStr) => {
+    if (dateStr === getTodayString()) return 'Today';
+    const date = new Date(dateStr + 'T00:00:00');
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (dateStr === yesterday.toISOString().split('T')[0]) return 'Yesterday';
+
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
   return (
     <div className="page home-page">
-      <h1 className="page-title">Daily Protein Tracker</h1>
-
+      {/* Date Navigation Header */}
+      <div className="date-navigation-header">
+        <button
+          className="date-nav-button"
+          onClick={() => navigateDate(-1)}
+          title="Previous day"
+        >
+          <FaChevronLeft />
+        </button>
+        <div className="current-date-display">
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            max={getTodayString()}
+            style={{
+              position: 'absolute',
+              opacity: 0,
+              width: '100%',
+              height: '100%',
+              cursor: 'pointer',
+              top: 0,
+              left: 0
+            }}
+          />
+          {formatDateDisplay(selectedDate)}
+        </div>
+        <button
+          className="date-nav-button"
+          onClick={() => navigateDate(1)}
+          disabled={selectedDate === getTodayString()}
+          title="Next day"
+        >
+          <FaChevronRight />
+        </button>
+      </div>
 
       {/* Progress Circle with Goal Status */}
       <div className="progress-card">
@@ -319,19 +388,19 @@ const Home = ({ user }) => {
 
         <div className="progress-circle-container">
           <div className="progress-circle">
-            <svg width="200" height="200" viewBox="0 0 200 200">
+            <svg width="220" height="220" viewBox="0 0 220 220">
               <circle
                 className="progress-circle-bg"
-                cx="100"
-                cy="100"
-                r="85"
+                cx="110"
+                cy="110"
+                r="96"
               />
               <circle
                 className="progress-circle-fill"
-                cx="100"
-                cy="100"
-                r="85"
-                strokeDasharray={`${progressPercentage * 5.34} 534`}
+                cx="110"
+                cy="110"
+                r="96"
+                strokeDasharray={`${progressPercentage * 6.03} 603`}
                 strokeDashoffset="0"
                 style={{ stroke: goalStatus.color }}
               />
@@ -346,23 +415,32 @@ const Home = ({ user }) => {
 
         <div className="progress-stats">
           <div className="stat">
-            <span className="stat-label">{remaining < 0 ? 'Over Target' : 'Remaining'}</span>
-            <span className="stat-value" style={{ color: remaining < 0 ? goalStatus.color : '#667eea' }}>
+            <span className="stat-icon">
+              <FaBullseye />
+            </span>
+            <span className="stat-value" style={{ color: remaining < 0 ? goalStatus.color : 'white' }}>
               {remaining < 0 ? '+' : ''}{Math.abs(Math.round(remaining))}g
             </span>
+            <span className="stat-label">{remaining < 0 ? 'Over Goal' : 'Remaining'}</span>
           </div>
           <div className="stat">
-            <span className="stat-label">Entries</span>
+            <span className="stat-icon">
+              <FaUtensils />
+            </span>
             <span className="stat-value">{entries.length}</span>
+            <span className="stat-label">Entries</span>
           </div>
           <div className="stat">
-            <span className="stat-label">Calories</span>
+            <span className="stat-icon">
+              <FaFire />
+            </span>
             <span className="stat-value">{Math.round(entries.reduce((sum, e) => sum + (e.calories || 0), 0))}</span>
+            <span className="stat-label">Calories</span>
           </div>
         </div>
       </div>
 
-      {/* 4-Pane Action Grid */}
+      {/* 3-Pane Action Grid */}
       <div className="action-grid">
         <div className="action-pane" onClick={() => setShowQuickAdd(true)}>
           <div className="action-icon">
@@ -380,45 +458,7 @@ const Home = ({ user }) => {
           <div className="action-icon">
             <FaCopy />
           </div>
-          <span className="action-label">Repeat</span>
-        </div>
-        <div className="action-pane calendar-pane">
-          <button
-            className="date-nav-btn date-nav-left"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigateDate(-1);
-            }}
-            title="Previous day"
-          >
-            <FaChevronLeft />
-          </button>
-          <div className="calendar-content">
-            <div className="action-icon">
-              <FaCalendar />
-            </div>
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              max={getTodayString()}
-              className="calendar-date-input"
-            />
-            <span className="action-label calendar-label">
-              {selectedDate === getTodayString() ? 'Today' : new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-            </span>
-          </div>
-          <button
-            className="date-nav-btn date-nav-right"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigateDate(1);
-            }}
-            disabled={selectedDate === getTodayString()}
-            title="Next day"
-          >
-            <FaChevronRight />
-          </button>
+          <span className="action-label">Copy From</span>
         </div>
       </div>
 
