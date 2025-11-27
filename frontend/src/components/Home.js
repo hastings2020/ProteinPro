@@ -20,7 +20,6 @@ const Home = ({ user }) => {
   const [notification, setNotification] = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
   const [selectedDate, setSelectedDate] = useState(getTodayString());
-  const [showCopyMenu, setShowCopyMenu] = useState(false);
   const [showCopyFromModal, setShowCopyFromModal] = useState(false);
   const [copyFromDate, setCopyFromDate] = useState('');
   const [copyFromEntries, setCopyFromEntries] = useState([]);
@@ -133,25 +132,6 @@ const Home = ({ user }) => {
     }
   };
 
-  const handleCopyEntry = async (entry, targetDate) => {
-    try {
-      const newEntry = await addEntry({
-        ...entry,
-        user_id: user.id,
-        entry_date: targetDate,
-        id: undefined
-      });
-      if (targetDate === selectedDate) {
-        setEntries([...entries, newEntry]);
-      }
-      showNotification(`Entry copied to ${targetDate}!`, 'success');
-      setShowCopyMenu(false);
-    } catch (error) {
-      console.error('Error copying entry:', error);
-      showNotification('Failed to copy entry', 'error');
-    }
-  };
-
   const handleAddToFavorites = async (entry) => {
     try {
       await addFavorite({
@@ -228,21 +208,6 @@ const Home = ({ user }) => {
       console.error('Error copying entries:', error);
       showNotification('Failed to copy entries', 'error');
     }
-  };
-
-  const getCopyOptions = () => {
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    const lastWeek = new Date(today);
-    lastWeek.setDate(lastWeek.getDate() - 7);
-
-    return [
-      { label: 'Today', date: today.toISOString().split('T')[0] },
-      { label: 'Yesterday', date: yesterday.toISOString().split('T')[0] },
-      { label: 'Last Week', date: lastWeek.toISOString().split('T')[0] }
-    ];
   };
 
   const openEditModal = (entry) => {
@@ -351,7 +316,7 @@ const Home = ({ user }) => {
         >
           <FaChevronLeft />
         </button>
-        <div className="current-date-display">
+        <div className="current-date-display" style={{ position: 'relative' }}>
           <input
             type="date"
             value={selectedDate}
@@ -364,10 +329,13 @@ const Home = ({ user }) => {
               height: '100%',
               cursor: 'pointer',
               top: 0,
-              left: 0
+              left: 0,
+              zIndex: 10
             }}
           />
-          {formatDateDisplay(selectedDate)}
+          <span style={{ position: 'relative', zIndex: 1, pointerEvents: 'none' }}>
+            {formatDateDisplay(selectedDate)}
+          </span>
         </div>
         <button
           className="date-nav-button"
@@ -551,16 +519,6 @@ const Home = ({ user }) => {
                     </button>
                     <button
                       className="btn-icon-tiny"
-                      onClick={() => {
-                        setEditingEntry(entry);
-                        setShowCopyMenu(entry.id);
-                      }}
-                      title="Copy to..."
-                    >
-                      <FaCopy />
-                    </button>
-                    <button
-                      className="btn-icon-tiny"
                       onClick={() => openEditModal(entry)}
                       title="Edit"
                     >
@@ -575,28 +533,6 @@ const Home = ({ user }) => {
                     </button>
                   </div>
                 </div>
-
-                {/* Copy Menu */}
-                {showCopyMenu === entry.id && (
-                  <div className="copy-menu">
-                    <div className="copy-menu-header">Copy to:</div>
-                    {getCopyOptions().map(option => (
-                      <button
-                        key={option.date}
-                        className="copy-option"
-                        onClick={() => handleCopyEntry(entry, option.date)}
-                      >
-                        {option.label} ({option.date})
-                      </button>
-                    ))}
-                    <button
-                      className="copy-option copy-cancel"
-                      onClick={() => setShowCopyMenu(false)}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                )}
               </div>
             ))}
           </div>
